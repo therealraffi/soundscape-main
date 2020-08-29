@@ -29,10 +29,16 @@ args = parser.parse_args()
 
 # # Capture & pridiction jobs
 raw_frames = queue.Queue(maxsize=100)
-f0 = []
+sep = []
+f0, f1, f2, f3 = [], [], [], []
+
 def callback(in_data, frame_count, time_info, status):
-    f0.append(in_data)
-    print(len(f0))
+    sep.append(in_data)
+    channels = np.fromstring(in_data, dtype='int16')
+    f0.append(channels[0::8].tostring())
+    f1.append(channels[1::8].tostring())
+    f2.append(channels[2::8].tostring())
+    f3.append(channels[3::8].tostring())
     wave = array.array('h', in_data)
     raw_frames.put(wave, True)
     return (None, pyaudio.paContinue)
@@ -113,8 +119,8 @@ def run_predictor():
     CHUNK = 1024 * 4
     FORMAT = pyaudio.paInt16
     CHANNELS = 4
-    RATE = 44100/2
-    cRATE = 22050
+    RATE = 22050 * 2
+    cRATE = 11025 * 2
     stream = p.open(format=FORMAT,
                     channels=CHANNELS,
                     rate=RATE,
@@ -131,12 +137,42 @@ def run_predictor():
             # time.sleep(0.001)
         except KeyboardInterrupt as e:
             print("Wow")
+
             wf = wave.open("class.wav", 'wb')
             wf.setnchannels(CHANNELS)
             wf.setsampwidth(p.get_sample_size(FORMAT))
             wf.setframerate(RATE)
+            wf.writeframes(b''.join(sep))
+            wf.close()
+
+            wf = wave.open('out0.wav', 'wb')
+            wf.setnchannels(1)
+            wf.setsampwidth(p.get_sample_size(FORMAT))
+            wf.setframerate(cRATE)
             wf.writeframes(b''.join(f0))
             wf.close()
+
+            wf1 = wave.open('out1.wav', 'wb')
+            wf1.setnchannels(1)
+            wf1.setsampwidth(p.get_sample_size(FORMAT))
+            wf1.setframerate(cRATE)
+            wf1.writeframes(b''.join(f1))
+            wf1.close()
+
+            wf2 = wave.open('out2.wav', 'wb')
+            wf2.setnchannels(1)
+            wf2.setsampwidth(p.get_sample_size(FORMAT))
+            wf2.setframerate(cRATE)
+            wf2.writeframes(b''.join(f2))
+            wf2.close()
+
+            wf3 = wave.open('out3.wav', 'wb')
+            wf3.setnchannels(1)
+            wf3.setsampwidth(p.get_sample_size(FORMAT))
+            wf3.setframerate(cRATE)
+            wf3.writeframes(b''.join(f3))
+            wf3.close()
+
             print("End")
             stream.stop_stream()
             stream.close()
