@@ -4,7 +4,6 @@
 # Run sound classifier in realtime.
 #
 from common import *
-
 import pyaudio
 import sys
 import time
@@ -13,6 +12,9 @@ import numpy as np
 import queue
 from collections import deque
 import argparse
+import socket
+import pyaudio
+import wave
 
 parser = argparse.ArgumentParser(description='Run sound classifier')
 parser.add_argument('--input', '-i', default='0', type=int,
@@ -27,7 +29,10 @@ args = parser.parse_args()
 
 # # Capture & pridiction jobs
 raw_frames = queue.Queue(maxsize=100)
+f0 = []
 def callback(in_data, frame_count, time_info, status):
+    f0.append(in_data)
+    print(len(f0))
     wave = array.array('h', in_data)
     raw_frames.put(wave, True)
     return (None, pyaudio.paContinue)
@@ -100,30 +105,44 @@ def run_predictor():
     if args.input < 0:
         print_pyaudio_devices()
         my_exit(model)
+    # Socket
+    HOST = "192.168.1.218"
+    PORT = 10000
     # normal: realtime mode
+    p = pyaudio.PyAudio()
+    CHUNK = 1024 * 4
     FORMAT = pyaudio.paInt16
-    CHANNELS = 1
-    audio = pyaudio.PyAudio()
-    stream = audio.open(
-                format=FORMAT,
-                channels=CHANNELS,
-                rate=conf.sampling_rate,
-                input=True,
-                # input_device_index=args.input,
-                frames_per_buffer=conf.rt_chunk_samples,
-                start=False,
-                stream_callback=callback # uncomment for non_blocking
-            )
+    CHANNELS = 4
+    RATE = 44100/2
+    cRATE = 22050
+    stream = p.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
+                    input=True,
+                    frames_per_buffer=CHUNK,
+                    start=False,
+                    stream_callback=callback)
+
     # main loop
     stream.start_stream()
     while stream.is_active():
-        main_process(model, on_predicted)
-        time.sleep(0.001)
-    stream.stop_stream()
-    stream.close()
-    # finish
-    audio.terminate()
-    my_exit(model)
+        try:
+            main_process(model, on_predicted)
+            # time.sleep(0.001)
+        except KeyboardInterrupt as e:
+            print("Wow")
+            wf = wave.open("class.wav", 'wb')
+            wf.setnchannels(CHANNELS)
+            wf.setsampwidth(p.get_sample_size(FORMAT))
+            wf.setframerate(RATE)
+            wf.writeframes(b''.join(f0))
+            wf.close()
+            print("End")
+            stream.stop_stream()
+            stream.close()
+            p.terminate()
+            my_exit(model)
+            break
 
 if __name__ == '__main__':
     run_predictor()
