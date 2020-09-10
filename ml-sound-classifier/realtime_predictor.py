@@ -23,11 +23,7 @@ parser.add_argument('--model-pb-graph', '-pb', default='', type=str,
 args = parser.parse_args()
 
 # # Capture & pridiction jobs
-fram = queue.Queue(maxsize=100)
-fra0 = queue.Queue(maxsize=100)
-fra1 = queue.Queue(maxsize=100)
-fra2 = queue.Queue(maxsize=100)
-fra3 = queue.Queue(maxsize=100)
+fram, fra0, fra1, fra2, fra3 = queue.Queue(maxsize=100), queue.Queue(maxsize=100), queue.Queue(maxsize=100), queue.Queue(maxsize=100), queue.Queue(maxsize=100)
 #record
 recm, rec0, rec1, rec2, rec3 = [], [], [], [], []
 #audio buffer
@@ -67,7 +63,7 @@ def callback(in_data, frame_count, time_info, status):
 
 def on_predicted(ensembled_pred, num):
     result = np.argmax(ensembled_pred)
-    print(num, conf.labels[result], ensembled_pred[result], (time.time() - save0)*100//100)
+    print(num, conf.labels[result], ensembled_pred[result], int((time.time() - save0)*1000)/1000)
 
 def main_process(model, on_predicted):
     # Pool audio data
