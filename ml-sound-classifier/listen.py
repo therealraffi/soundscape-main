@@ -1,99 +1,85 @@
 import socket
-import sys
-import json
-import math
+import pyaudio
 import numpy as np
-import matplotlib.pyplot as plt
-from time import sleep
-from pixel_ring import pixel_ring
-from gpiozero import LED
-import serial
+import wave
+# Socket
+HOST = "192.168.1.218"
+PORT = 10000
 
-#pixel ring
-power = LED(5)
-power.on()
-pixel_ring.set_brightness(20)
-pixel_ring.change_pattern('custom')
-
-#tcp stuff
+# Audio
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_address = ('127.0.0.1', 9000)
+server_address = (HOST, PORT)
 sock.bind(server_address)
 sock.listen(1)
 
-#serial
-'''
-ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
-ser.flush()
-'''
-motors = [0, 0, 0, 0, 0, 0]
+p = pyaudio.PyAudio()
+CHUNK = 1024 * 4
+FORMAT = pyaudio.paInt16
+CHANNELS = 4
+RATE = 44100
+cRATE = 22050
 
+#record channel
+fm, f0, f1, f2, f3 = [], [], [], [], []
+stream = True
 
-#plt
-plt.axis([-1.1, 1.1, -1.1, 1.1])
-ax = plt.gca()
-ax.spines['top'].set_color('none')
-ax.spines['bottom'].set_position('zero')
-ax.spines['left'].set_position('zero')
-ax.spines['right'].set_color('none')
-ax.add_artist(plt.Circle((0, 0), 1, color='k', fill=False))
-ax.set_aspect("equal")
-
-while True:
+while stream:
     connection, client_address = sock.accept()
-    try:
-        while True:
-            data = connection.recv(4096)
-            coord = data.decode().replace("\n", "").split("}\n{")[0]
-            try:
-                coord = json.loads(coord)["src"]
-                points = []
-                ind = []
-                colors = ["r", "g", "b", "m"]
-                for c, i in enumerate(coord):
-                    x = i["x"]
-                    y = i["y"]
-                    z = i["z"]
-                    if x != 0 and y != 0 and z != 0:
-                        theta = math.atan(y/x)
-                        x_f = abs(math.cos(theta)) * x / abs(x) * -1
-                        y_f = abs(math.sin(theta)) * y / abs(y) * -1
-                        points.append([x_f, y_f])
-                        ind.append(colors[c])
-                points = np.array(points)
-                ledstr = ""
-                for i in range(len(points)):
-                    angle = math.atan2(points[i][1], points[i][0]) * 180 / math.pi
-                    if angle < 0:
-                        angle += 360
-                    ledstr += str(int(angle//30) % 12) + " " + ind[i] + "-"
-                    motors[int(angle//60) % 6] = 1
+    data = connection.recv(8192)
 
-                out = "<" + str(motors[0]) + ", " + str(motors[1]) + ">"
-#                ser.write(out.encode())
-                pixel_ring.wakeup(ledstr)
-#                print(ledstr)
-#                print(points)
-#                print(coord)
-#                points = plt.scatter(points[:, 0], points[:, 1], c=ind, s = 50)
-#                plt.pause(0.000001)
-#                points.remove()
-#                print("\n")
-#                pixel_ring.off()
-            except Exception as e:
-                motors[0] = 0
-                motors[1] = 0
-                out = "<" + str(motors[0]) + ", " + str(motors[1]) + ">"
-#                ser.write(out.encode())
-#                connection.close()
-#                print(e)
-                pass
-            if data:
-                pass
-            else:
-                print('no more data from')
-                break
-    finally:
-        connection.close()
+    while data != "":
+        try:
+            data = connection.recv(8192)
+            channels = np.fromstring(data, dtype='int16')
+            c0 = channels[0::8] #red
+            c1 = channels[1::8] #green
+            c2 = channels[2::8] #blue
+            c3 = channels[3::8] #purple
 
-#plt.show()
+            fm.append(data)
+            f0.append(c0.tostring())
+            f1.append(c1.tostring())
+            f2.append(c2.tostring())
+            f3.append(c3.tostring())
+
+        except (socket.error, KeyboardInterrupt) as e:
+            print("Client Disconnected")
+
+            wf = wave.open('class.wav', 'wb')
+            wf.setnchannels(4)
+            wf.setsampwidth(2)
+            wf.setframerate(RATE)
+            wf.writeframes(b''.join(fm))
+            wf.close()
+
+            wf = wave.open('out0.wav', 'wb')
+            wf.setnchannels(1)
+            wf.setsampwidth(2)
+            wf.setframerate(cRATE)
+            wf.writeframes(b''.join(f0))
+            wf.close()
+
+            wf1 = wave.open('out1.wav', 'wb')
+            wf1.setnchannels(1)
+            wf1.setsampwidth(2)
+            wf1.setframerate(cRATE)
+            wf1.writeframes(b''.join(f1))
+            wf1.close()
+
+            wf2 = wave.open('out2.wav', 'wb')
+            wf2.setnchannels(1)
+            wf2.setsampwidth(2)
+            wf2.setframerate(cRATE)
+            wf2.writeframes(b''.join(f2))
+            wf2.close()
+
+            wf3 = wave.open('out3.wav', 'wb')
+            wf3.setnchannels(1)
+            wf3.setsampwidth(2)
+            wf3.setframerate(cRATE)
+            wf3.writeframes(b''.join(f3))
+            wf3.close()
+            print("done saving")
+            stream = False
+            break
+        

@@ -19,12 +19,6 @@ stream = p.open(format=FORMAT,
                 output=True,
                 frames_per_buffer=CHUNK)
 
-channel0 = p.open(format=FORMAT,
-                channels=1,
-                rate=cRATE,
-                output=True,
-                frames_per_buffer=1024)
-
 #record channel
 fm, f0, f1, f2, f3 = [], [], [], [], []
 
@@ -39,10 +33,10 @@ with socket.socket() as server_socket:
         try:
             data = conn.recv(8192)
             channels = np.fromstring(data, dtype='int16')
-            c0 = channels[0::8]
-            c1 = channels[1::8]
-            c2 = channels[2::8]
-            c3 = channels[3::8]
+            c0 = channels[0::8] #red
+            c1 = channels[1::8] #green
+            c2 = channels[2::8] #blue
+            c3 = channels[3::8] #purple
 
             fm.append(data)
             f0.append(c0.tostring())
