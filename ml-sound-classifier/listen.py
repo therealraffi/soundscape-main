@@ -12,7 +12,6 @@ server_address = (HOST, PORT)
 sock.bind(server_address)
 sock.listen(1)
 
-p = pyaudio.PyAudio()
 CHUNK = 1024 * 4
 FORMAT = pyaudio.paInt16
 CHANNELS = 4

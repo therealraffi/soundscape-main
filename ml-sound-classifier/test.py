@@ -23,37 +23,32 @@ parser.add_argument('--model-pb-graph', '-pb', default='', type=str,
 args = parser.parse_args()
 
 # # Capture & pridiction jobs
-raw_frames = queue.Queue(maxsize=100)
-sep = []
-f0, f1, f2, f3 = [], [], [], []
+fram, fra0, fra1, fra2, fra3 = queue.Queue(maxsize=100), queue.Queue(maxsize=100), queue.Queue(maxsize=100), queue.Queue(maxsize=100), queue.Queue(maxsize=100)
+#record
+recm, rec0, rec1, rec2, rec3 = [], [], [], [], []
+#audio buffer
+buffm, buff0, buff1, buff2, buff3 = [], [], [], [], []
+#pred queue
+predm, pred0, pred1, pred2, pred3 = deque(maxlen=conf.pred_ensembles), deque(maxlen=conf.pred_ensembles), deque(maxlen=conf.pred_ensembles), deque(maxlen=conf.pred_ensembles), deque(maxlen=conf.pred_ensembles)
 
-def callback(in_data, frame_count, time_info, status):
-    sep.append(in_data)
-    channels = np.fromstring(in_data, dtype='int16')
-    f0.append(channels[0::8].tostring())
-    f1.append(channels[1::8].tostring())
-    f2.append(channels[2::8].tostring())
-    f3.append(channels[3::8].tostring())
-    wave = array.array('h', in_data)
-    raw_frames.put(wave, True)
-    return (None, pyaudio.paContinue)
+save0 = time.time()
 
-def on_predicted(ensembled_pred):
+def on_predicted(ensembled_pred, num):
     result = np.argmax(ensembled_pred)
-    print(conf.labels[result], ensembled_pred[result])
+    print(num, conf.labels[result], ensembled_pred[result], int((time.time() - save0)*1000)/1000)
 
-raw_audio_buffer = []
-pred_queue = deque(maxlen=conf.pred_ensembles)
 def main_process(model, on_predicted):
     # Pool audio data
-    global raw_audio_buffer
-    while not raw_frames.empty():
-        raw_audio_buffer.extend(raw_frames.get())
-        if len(raw_audio_buffer) >= conf.mels_convert_samples: break
-    if len(raw_audio_buffer) < conf.mels_convert_samples: return
+    global buffm
+    global fram
+    global predm
+    while not fram.empty():
+        buffm.extend(fram.get())
+        if len(buffm) >= conf.mels_convert_samples: break
+    if len(buffm) < conf.mels_convert_samples: return
     # Convert to log mel-spectrogram
-    audio_to_convert = np.array(raw_audio_buffer[:conf.mels_convert_samples]) / 32767
-    raw_audio_buffer = raw_audio_buffer[conf.mels_onestep_samples:]
+    audio_to_convert = np.array(buffm[:conf.mels_convert_samples]) / 32767
+    buffm = buffm[conf.mels_onestep_samples:]
     mels = audio_to_melspectrogram(conf, audio_to_convert)
     # Predict, ensemble
     X = []
@@ -64,16 +59,112 @@ def main_process(model, on_predicted):
     samplewise_normalize_audio_X(X)
     raw_preds = model.predict(X)
     for raw_pred in raw_preds:
-        pred_queue.append(raw_pred)
-        ensembled_pred = geometric_mean_preds(np.array([pred for pred in pred_queue]))
-        on_predicted(ensembled_pred)
+        predm.append(raw_pred)
+        ensembled_pred = geometric_mean_preds(np.array([pred for pred in predm]))
+        on_predicted(ensembled_pred, "m")
+
+def main_process0(model, on_predicted):
+    # Pool audio data
+    global buff0
+    while not fra0.empty():
+        buff0.extend(fra0.get())
+        if len(buff0) >= conf.mels_convert_samples: break
+    if len(buff0) < conf.mels_convert_samples: return
+    # Convert to log mel-spectrogram
+    audio_to_convert = np.array(buff0[:conf.mels_convert_samples]) / 32767
+    buff0 = buff0[conf.mels_onestep_samples:]
+    mels = audio_to_melspectrogram(conf, audio_to_convert)
+    # Predict, ensemble
+    X = []
+    for i in range(conf.rt_process_count):
+        cur = int(i * conf.dims[1] / conf.rt_oversamples)
+        X.append(mels[:, cur:cur+conf.dims[1], np.newaxis])
+    X = np.array(X)
+    samplewise_normalize_audio_X(X)
+    raw_preds = model.predict(X)
+    for raw_pred in raw_preds:
+        pred0.append(raw_pred)
+        ensembled_pred = geometric_mean_preds(np.array([pred for pred in pred0]))
+        on_predicted(ensembled_pred, 0)
+
+def main_process1(model, on_predicted):
+    # Pool audio data
+    global buff1
+    while not fra1.empty():
+        buff1.extend(fra1.get())
+        if len(buff1) >= conf.mels_convert_samples: break
+    if len(buff1) < conf.mels_convert_samples: return
+    # Convert to log mel-spectrogram
+    audio_to_convert = np.array(buff1[:conf.mels_convert_samples]) / 32767
+    buff1 = buff1[conf.mels_onestep_samples:]
+    mels = audio_to_melspectrogram(conf, audio_to_convert)
+    # Predict, ensemble
+    X = []
+    for i in range(conf.rt_process_count):
+        cur = int(i * conf.dims[1] / conf.rt_oversamples)
+        X.append(mels[:, cur:cur+conf.dims[1], np.newaxis])
+    X = np.array(X)
+    samplewise_normalize_audio_X(X)
+    raw_preds = model.predict(X)
+    for raw_pred in raw_preds:
+        pred1.append(raw_pred)
+        ensembled_pred = geometric_mean_preds(np.array([pred for pred in pred1]))
+        on_predicted(ensembled_pred, 1)
+
+def main_process2(model, on_predicted):
+    # Pool audio data
+    global buff2
+    while not fra2.empty():
+        buff2.extend(fra2.get())
+        if len(buff2) >= conf.mels_convert_samples: break
+    if len(buff2) < conf.mels_convert_samples: return
+    # Convert to log mel-spectrogram
+    audio_to_convert = np.array(buff2[:conf.mels_convert_samples]) / 32767
+    buff2 = buff2[conf.mels_onestep_samples:]
+    mels = audio_to_melspectrogram(conf, audio_to_convert)
+    # Predict, ensemble
+    X = []
+    for i in range(conf.rt_process_count):
+        cur = int(i * conf.dims[1] / conf.rt_oversamples)
+        X.append(mels[:, cur:cur+conf.dims[1], np.newaxis])
+    X = np.array(X)
+    samplewise_normalize_audio_X(X)
+    raw_preds = model.predict(X)
+    for raw_pred in raw_preds:
+        pred2.append(raw_pred)
+        ensembled_pred = geometric_mean_preds(np.array([pred for pred in pred2]))
+        on_predicted(ensembled_pred, 2)
+
+def main_process3(model, on_predicted):
+    # Pool audio data
+    global buff3
+    while not fra3.empty():
+        buff3.extend(fra3.get())
+        if len(buff3) >= conf.mels_convert_samples: break
+    if len(buff3) < conf.mels_convert_samples: return
+    # Convert to log mel-spectrogram
+    audio_to_convert = np.array(buff3[:conf.mels_convert_samples]) / 32767
+    buff3 = buff3[conf.mels_onestep_samples:]
+    mels = audio_to_melspectrogram(conf, audio_to_convert)
+    # Predict, ensemble
+    X = []
+    for i in range(conf.rt_process_count):
+        cur = int(i * conf.dims[1] / conf.rt_oversamples)
+        X.append(mels[:, cur:cur+conf.dims[1], np.newaxis])
+    X = np.array(X)
+    samplewise_normalize_audio_X(X)
+    raw_preds = model.predict(X)
+    for raw_pred in raw_preds:
+        pred3.append(raw_pred)
+        ensembled_pred = geometric_mean_preds(np.array([pred for pred in pred3]))
+        on_predicted(ensembled_pred, 3)
 
 # # Main controller
 def process_file(model, filename, on_predicted=on_predicted):
     # Feed audio data as if it was recorded in realtime
     audio = read_audio(conf, filename, trim_long_data=False) * 32767
     while len(audio) > conf.rt_chunk_samples:
-        raw_frames.put(audio[:conf.rt_chunk_samples])
+        fram.put(audio[:conf.rt_chunk_samples])
         audio = audio[conf.rt_chunk_samples:]
         main_process(model, on_predicted)
 
@@ -96,84 +187,85 @@ def get_model(graph_file):
         keras_learning_phase_name=model_node[conf.model][1],
         output_name=model_node[conf.model][2])
 
-def run_predictor():
-    model = get_model(args.model_pb_graph)
-    # file mode
-    if args.input_file != '':
-        process_file(model, args.input_file)
-        my_exit(model)
-    # device list display mode
-    if args.input < 0:
-        print_pyaudio_devices()
-        my_exit(model)
-    # Socket
-    HOST = "192.168.1.218"
-    PORT = 10000
-    # normal: realtime mode
-    p = pyaudio.PyAudio()
-    CHUNK = 1024 * 4
+def saveaudio(name, channel, rate, arr):
     FORMAT = pyaudio.paInt16
-    CHANNELS = 4
-    RATE = 22050 * 2
-    cRATE = 11025 * 2
-    stream = p.open(format=FORMAT,
-                    channels=CHANNELS,
-                    rate=RATE,
-                    input=True,
-                    frames_per_buffer=CHUNK,
-                    start=False,
-                    stream_callback=callback)
+    wf = wave.open(name, 'wb')
+    wf.setnchannels(channel)
+    wf.setsampwidth(2)
+    wf.setframerate(rate)
+    wf.writeframes(b''.join(arr))
+    wf.close()
 
-    # main loop
-    stream.start_stream()
-    while stream.is_active():
+# Socket
+HOST = "192.168.1.218"
+PORT = 10000
+
+# Audio
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_address = (HOST, PORT)
+sock.bind(server_address)
+sock.listen(1)
+
+CHUNK = 1024 * 4
+FORMAT = pyaudio.paInt16
+CHANNELS = 4
+RATE = 44100
+cRATE = 22050
+
+stream = True
+model = get_model(args.model_pb_graph)
+while stream:
+    connection, client_address = sock.accept()
+    data = connection.recv(8192)
+    while data != "":
         try:
+            data = connection.recv(8192)
+            channels = np.fromstring(data, dtype='int16')
+
+            t0 = channels[0::8].tostring()
+            t1 = channels[1::8].tostring()
+            t2 = channels[2::8].tostring()
+            t3 = channels[3::8].tostring()
+
+            recm.append(data)
+            rec0.append(t0)
+            rec1.append(t1)
+            rec2.append(t2)
+            rec3.append(t3)
+
+            wavem = array.array('h', data)
+            wave0 = array.array('h', t0)
+            wave1 = array.array('h', t1)
+            wave2 = array.array('h', t2)
+            wave3 = array.array('h', t3)
+
+            fram.put(wavem, True)
+            fra0.put(wave0, True)
+            fra1.put(wave1, True)
+            fra2.put(wave2, True)
+            fra3.put(wave3, True)
+            #combined
             main_process(model, on_predicted)
+            #channel 0
+            main_process0(model, on_predicted)
+            #channel 1
+            main_process1(model, on_predicted)
+            #channel 2
+            main_process2(model, on_predicted)
+            #channel 3
+            main_process3(model, on_predicted)
             # time.sleep(0.001)
         except KeyboardInterrupt as e:
-            print("Wow")
+            print("Saving...")
 
-            wf = wave.open("class.wav", 'wb')
-            wf.setnchannels(CHANNELS)
-            wf.setsampwidth(p.get_sample_size(FORMAT))
-            wf.setframerate(RATE)
-            wf.writeframes(b''.join(sep))
-            wf.close()
-
-            wf = wave.open('out0.wav', 'wb')
-            wf.setnchannels(1)
-            wf.setsampwidth(p.get_sample_size(FORMAT))
-            wf.setframerate(cRATE)
-            wf.writeframes(b''.join(f0))
-            wf.close()
-
-            wf1 = wave.open('out1.wav', 'wb')
-            wf1.setnchannels(1)
-            wf1.setsampwidth(p.get_sample_size(FORMAT))
-            wf1.setframerate(cRATE)
-            wf1.writeframes(b''.join(f1))
-            wf1.close()
-
-            wf2 = wave.open('out2.wav', 'wb')
-            wf2.setnchannels(1)
-            wf2.setsampwidth(p.get_sample_size(FORMAT))
-            wf2.setframerate(cRATE)
-            wf2.writeframes(b''.join(f2))
-            wf2.close()
-
-            wf3 = wave.open('out3.wav', 'wb')
-            wf3.setnchannels(1)
-            wf3.setsampwidth(p.get_sample_size(FORMAT))
-            wf3.setframerate(cRATE)
-            wf3.writeframes(b''.join(f3))
-            wf3.close()
+            saveaudio("class.wav", 4, RATE, recm)
+            saveaudio("out0.wav", 1, cRATE, rec0)
+            saveaudio("out1.wav", 1, cRATE, rec1)
+            saveaudio("out2.wav", 1, cRATE, rec2)
+            saveaudio("out3.wav", 1, cRATE, rec3)
 
             print("End")
-            stream.stop_stream()
-            stream.close()
-            p.terminate()
             my_exit(model)
+            print("done")
+            stream = False
             break
-
-if __name__ == '__main__':
-    run_predictor()

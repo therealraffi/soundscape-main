@@ -33,34 +33,6 @@ predm, pred0, pred1, pred2, pred3 = deque(maxlen=conf.pred_ensembles), deque(max
 
 save0 = time.time()
 
-def callback(in_data, frame_count, time_info, status):
-    channels = np.fromstring(in_data, dtype='int16')
-
-    t0 = channels[0::8].tostring()
-    t1 = channels[1::8].tostring()
-    t2 = channels[2::8].tostring()
-    t3 = channels[3::8].tostring()
-
-    recm.append(in_data)
-    rec0.append(t0)
-    rec1.append(t1)
-    rec2.append(t2)
-    rec3.append(t3)
-
-    wavem = array.array('h', in_data)
-    wave0 = array.array('h', t0)
-    wave1 = array.array('h', t1)
-    wave2 = array.array('h', t2)
-    wave3 = array.array('h', t3)
-
-    fram.put(wavem, True)
-    fra0.put(wave0, True)
-    fra1.put(wave1, True)
-    fra2.put(wave2, True)
-    fra3.put(wave3, True)
-    
-    return (None, pyaudio.paContinue)
-
 def on_predicted(ensembled_pred, num):
     result = np.argmax(ensembled_pred)
     print(num, conf.labels[result], ensembled_pred[result], int((time.time() - save0)*1000)/1000)
@@ -68,6 +40,8 @@ def on_predicted(ensembled_pred, num):
 def main_process(model, on_predicted):
     # Pool audio data
     global buffm
+    global fram
+    global predm
     while not fram.empty():
         buffm.extend(fram.get())
         if len(buffm) >= conf.mels_convert_samples: break
@@ -213,69 +187,86 @@ def get_model(graph_file):
         keras_learning_phase_name=model_node[conf.model][1],
         output_name=model_node[conf.model][2])
 
-def saveaudio(name, channel, rate, arr, audio):
+def saveaudio(name, channel, rate, arr):
     FORMAT = pyaudio.paInt16
     wf = wave.open(name, 'wb')
     wf.setnchannels(channel)
-    wf.setsampwidth(audio.get_sample_size(FORMAT))
+    wf.setsampwidth(2)
     wf.setframerate(rate)
     wf.writeframes(b''.join(arr))
     wf.close()
 
-def run_predictor():
-    model = get_model(args.model_pb_graph)
-    # file mode
-    if args.input_file != '':
-        process_file(model, args.input_file)
-        my_exit(model)
-    # device list display mode
-    if args.input < 0:
-        print_pyaudio_devices()
-        my_exit(model)
-    # Socket
-    HOST = "192.168.1.218"
-    PORT = 10000
-    # normal: realtime mode
-    p = pyaudio.PyAudio()
-    CHUNK = 1024 * 4
-    FORMAT = pyaudio.paInt16
-    CHANNELS = 4
-    RATE = 22050 * 2
-    cRATE = 11025 * 2
-    stream = p.open(format=FORMAT,
-                    channels=CHANNELS,
-                    rate=RATE,
-                    input=True,
-                    frames_per_buffer=CHUNK,
-                    start=False,
-                    stream_callback=callback)
+# Socket
+HOST = "192.168.1.218"
+PORT = 10000
 
-    # main loop
-    stream.start_stream()
-    while stream.is_active():
+# Audio
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_address = (HOST, PORT)
+sock.bind(server_address)
+sock.listen(1)
+
+CHUNK = 1024 * 4
+FORMAT = pyaudio.paInt16
+CHANNELS = 4
+RATE = 44100
+cRATE = 22050
+
+stream = True
+model = get_model(args.model_pb_graph)
+while stream:
+    connection, client_address = sock.accept()
+    data = connection.recv(8192)
+    while data != "":
         try:
+            print("as")
+            data = connection.recv(8192)
+            channels = np.fromstring(data, dtype='int16')
+
+            t0 = channels[0::8].tostring()
+            t1 = channels[1::8].tostring()
+            t2 = channels[2::8].tostring()
+            t3 = channels[3::8].tostring()
+
+            recm.append(data)
+            rec0.append(t0)
+            rec1.append(t1)
+            rec2.append(t2)
+            rec3.append(t3)
+
+            wavem = array.array('h', data)
+            wave0 = array.array('h', t0)
+            wave1 = array.array('h', t1)
+            wave2 = array.array('h', t2)
+            wave3 = array.array('h', t3)
+
+            fram.put(wavem, True)
+            fra0.put(wave0, True)
+            fra1.put(wave1, True)
+            fra2.put(wave2, True)
+            fra3.put(wave3, True)
+            #combined
             main_process(model, on_predicted)
+            #channel 0
             main_process0(model, on_predicted)
+            #channel 1
             main_process1(model, on_predicted)
+            #channel 2
             main_process2(model, on_predicted)
+            #channel 3
             main_process3(model, on_predicted)
             # time.sleep(0.001)
         except KeyboardInterrupt as e:
             print("Saving...")
 
-            saveaudio("class.wav", CHANNELS, RATE, recm, p)
-            saveaudio("out0.wav", 1, cRATE, rec0, p)
-            saveaudio("out1.wav", 1, cRATE, rec1, p)
-            saveaudio("out2.wav", 1, cRATE, rec2, p)
-            saveaudio("out3.wav", 1, cRATE, rec3, p)
+            saveaudio("class.wav", 4, RATE, recm)
+            saveaudio("out0.wav", 1, cRATE, rec0)
+            saveaudio("out1.wav", 1, cRATE, rec1)
+            saveaudio("out2.wav", 1, cRATE, rec2)
+            saveaudio("out3.wav", 1, cRATE, rec3)
 
             print("End")
-            stream.stop_stream()
-            stream.close()
-            p.terminate()
             my_exit(model)
             print("done")
+            stream = False
             break
-
-if __name__ == '__main__':
-    run_predictor()
