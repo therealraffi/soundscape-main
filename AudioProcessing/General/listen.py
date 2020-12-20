@@ -58,7 +58,7 @@ while stream:
             f2.append(c2.tostring())
             f3.append(c3.tostring())
 
-            print ("|" * int(amplitude(data)))
+            print(int(amplitude(c0.tostring())), "\t", int(amplitude(c1.tostring())), "\t", int(amplitude(c2.tostring())), "\t", int(amplitude(c3.tostring())))
 
         except (socket.error, KeyboardInterrupt) as e:
             print("Client Disconnected")
