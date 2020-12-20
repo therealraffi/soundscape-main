@@ -15,7 +15,8 @@ RATE = 44100
 stream = p.open(format=FORMAT,
                 channels=CHANNELS,
                 rate=RATE,
-                output=True,
+                output=True,                
+                input_device_index=3,
                 frames_per_buffer=CHUNK)
 
 with socket.socket() as server_socket:

@@ -1,13 +1,10 @@
-import socket
-import pyaudio
+import sounddevice as sd
+import numpy as np
 
-# Socket
-HOST = "192.168.1.218"
-PORT = 10000
+def print_sound(indata, outdata, frames, time, status):
+    volume_norm = np.linalg.norm(indata)*10
+    print ("|" * int(volume_norm))
 
-# Audio
-p = pyaudio.PyAudio()
-
-for i in range(10):
-    print(p.get_device_info_by_index(i)["maxInputChannels"])
-    print("\n")
+with sd.Stream(callback=print_sound):
+    while(True):
+        pass
