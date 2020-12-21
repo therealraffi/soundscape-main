@@ -72,7 +72,7 @@ def avgfreq(block):
         out = 0
         for i in range(len(w)):
             out += w[i] * freqs[i]
-        return int(out)
+        return 0 if math.isnan(float(out)) else int(out)
 
 while True:
     data = stream.read(CHUNK, exception_on_overflow=False)
