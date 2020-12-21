@@ -6,6 +6,8 @@ from scipy import signal
 import wave
 import math
 import serial
+import time
+import json
 
 #Arduino usb
 s = serial.Serial(port='/dev/tty.usbserial-14230', baudrate=9600)
@@ -16,7 +18,7 @@ CHANNELS = 1
 RATE = 44100
 CHUNK = 8192
 stream = mic.open(format=FORMAT, channels=CHANNELS, rate=RATE,
-                  input_device_index=3,
+                  input_device_index=6,
                   input=True, frames_per_buffer=CHUNK)
 
 '''
@@ -51,6 +53,7 @@ def amplitude(block):
 
 def avgfreq(block):
         result = np.fromstring(block, dtype=np.int16)
+
         w = np.fft.fft(result)
         freqs = np.abs((np.fft.fftfreq(len(w))*44100))
 
@@ -68,23 +71,32 @@ def avgfreq(block):
         freqs = np.average(np.reshape(freqs, (-1, bin_const)), axis=1)
         w = w / np.sum(w)
         freqdict = dict(zip(freqs, w))
+        wsum = sum(w)
 
+        # print(w)
+        # for i in freqdict:
+        #     print(int(i), "\t", freqdict[i] * 100 / wsum)
+        # print()
+        
         out = 0
         for i in range(len(w)):
-            out += w[i] * freqs[i]
+            out += w[i] * freqs[i] / wsum
+
         return 0 if math.isnan(float(out)) else int(out)
+
+init = time.time()
 
 while True:
     data = stream.read(CHUNK, exception_on_overflow=False)
 
     #amplitude
     amp = str(amplitude(data))
+    print(avgfreq(data), "\t", "|" * int(amp))
     out = "<%s, %s, %s, %s, %s, %s>" % (amp, amp, amp, amp, amp, amp)
     #write command to ardunio
     s.write(out.encode())
 
-    data = np.frombuffer(data, dtype='b')
-    print(avgfreq(data), "\t", "|" * int(amp))
+    # data = np.frombuffer(data, dtype='b')
 
 stream.stop_stream()
 stream.close()
