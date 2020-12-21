@@ -72,15 +72,11 @@ def avgfreq(block):
         out = 0
         for i in range(len(w)):
             out += w[i] * freqs[i]
-        return out
+        return int(out)
 
 while True:
     data = stream.read(CHUNK, exception_on_overflow=False)
 
-    window = np.blackman(CHUNK)
-    indata = np.array(wave.struct.unpack("%dh"%(len(data)/CHANNELS), data))*window
-    fftData=abs(np.fft.rfft(indata))**2
-    print(fftData)
     #amplitude
     amp = str(amplitude(data))
     out = "<%s, %s, %s, %s, %s, %s>" % (amp, amp, amp, amp, amp, amp)
@@ -88,7 +84,7 @@ while True:
     s.write(out.encode())
 
     data = np.frombuffer(data, dtype='b')
-    print ("|" * int(amp))
+    print(avgfreq(data), "\t", "|" * int(amp))
 
 stream.stop_stream()
 stream.close()
