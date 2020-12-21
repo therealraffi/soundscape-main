@@ -18,7 +18,7 @@ CHANNELS = 1
 RATE = 44100
 CHUNK = 8192
 stream = mic.open(format=FORMAT, channels=CHANNELS, rate=RATE,
-                  input_device_index=6,
+                  input_device_index=3,
                   input=True, frames_per_buffer=CHUNK)
 
 '''
@@ -36,7 +36,7 @@ Screen Record Audio
 '''
 
 def sig(num):
-    return 1/(1 + math.exp(-30 * num))
+    return 1/(1 + math.exp(-1 * num))
 
 def amplitude(block):
     count = len(block)/2
@@ -73,11 +73,11 @@ def avgfreq(block):
         freqdict = dict(zip(freqs, w))
         wsum = sum(w)
 
-        # print(w)
-        # for i in freqdict:
-        #     print(int(i), "\t", freqdict[i] * 100 / wsum)
-        # print()
-        
+        print()
+        for i in freqdict:
+            print(int(i), "\t", freqdict[i] * 100 / wsum)
+        print()
+
         out = 0
         for i in range(len(w)):
             out += w[i] * freqs[i] / wsum
@@ -97,6 +97,7 @@ while True:
     s.write(out.encode())
 
     # data = np.frombuffer(data, dtype='b')
+    # result = np.fromstring(data, dtype=np.int16)
 
 stream.stop_stream()
 stream.close()
