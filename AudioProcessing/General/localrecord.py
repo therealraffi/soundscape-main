@@ -7,8 +7,6 @@ import math
 import time
 import json
 import noisereduce as nr
-from scipy.io import wavfile
-import librosa
 
 mic = pyaudio.PyAudio()
 
@@ -17,7 +15,7 @@ CHANNELS = 1
 RATE = 44100
 CHUNK = 8192
 stream = mic.open(format=FORMAT, channels=CHANNELS, rate=RATE,
-                  input_device_index=0,
+                  input_device_index=3,
                   input=True, frames_per_buffer=CHUNK)
 
 '''
@@ -62,10 +60,9 @@ except KeyboardInterrupt:
 print()
 print("filter")
 reduced_noise = nr.reduce_noise(audio_clip=fint.astype('float32'), noise_clip=bint.astype('float32'), verbose=False).astype('int16')
-# print(reduced_noise)
 
-print(fint, len(fint), min(fint), max(fint))
-print(reduced_noise, len(reduced_noise), min(reduced_noise), max(reduced_noise))
+# print(fint, len(fint), min(fint), max(fint))
+# print(reduced_noise, len(reduced_noise), min(reduced_noise), max(reduced_noise))
 
 wf = wave.open('back.wav', 'wb')
 wf.setnchannels(CHANNELS)

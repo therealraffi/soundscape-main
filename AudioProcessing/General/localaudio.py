@@ -8,6 +8,7 @@ import math
 import serial
 import time
 import json
+import noisereduce as nr
 
 #Arduino usb
 s = serial.Serial(port='/dev/tty.usbserial-14230', baudrate=9600)
@@ -73,10 +74,10 @@ def avgfreq(block):
         freqdict = dict(zip(freqs, w))
         wsum = sum(w)
 
-        print()
-        for i in freqdict:
-            print(int(i), "\t", freqdict[i] * 100 / wsum)
-        print()
+        # print()
+        # for i in freqdict:
+        #     print(int(i), "\t", freqdict[i] * 100 / wsum)
+        # print()
 
         out = 0
         for i in range(len(w)):
@@ -84,20 +85,40 @@ def avgfreq(block):
 
         return 0 if math.isnan(float(out)) else int(out)
 
-init = time.time()
+def filter(audio, background):
+    #audio = np.array([], dtype=np.int16) - type array
+    reduced_noise = nr.reduce_noise(audio_clip=audio.astype('float32'), noise_clip=background.astype('float32'), verbose=False).astype('int16')
+    return reduced_noise.tobytes()
 
-while True:
+print("start background recording")
+
+t1 = time.time()
+backint = np.array([], dtype=np.int16)
+while(time.time() - t1 < 2):
     data = stream.read(CHUNK, exception_on_overflow=False)
+    data = np.frombuffer(data, dtype=np.int16)
+    backint = np.append(backint, data)
 
-    #amplitude
-    amp = amplitude(data)
-    print(avgfreq(data), "\t", "|" * int(amp))
-    out = "<%s, %s, %s, %s, %s, %s>" % (amp, amp, amp, amp, amp, amp)
-    #write command to ardunio
-    s.write(out.encode())
+print("start main stream")
 
-    # data = np.frombuffer(data, dtype='b')
-    # result = np.fromstring(data, dtype=np.int16)
+try:
+    while True:
+        data = stream.read(CHUNK, exception_on_overflow=False)
+        #amplitude
+        amp = amplitude(data)
+        print(avgfreq(data), "\t", "|" * int(amp))
+        out = "<%s, %s, %s, %s, %s, %s>" % (amp, amp, amp, amp, amp, amp)
+        #write command to ardunio
+        s.write(out.encode())
+
+        data = np.frombuffer(data, dtype=np.int16)
+        filtered = filter(data, backint)
+        amp2 = amplitude(filtered)
+        print(amp, amp2, avgfreq(filtered))
+        # data = np.frombuffer(data, dtype='b')
+        # result = np.fromstring(data, dtype=np.int16)
+except KeyboardInterrupt:
+    pass
 
 stream.stop_stream()
 stream.close()
