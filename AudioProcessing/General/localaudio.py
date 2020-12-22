@@ -37,7 +37,7 @@ Screen Record Audio
 '''
 
 def sig(num):
-    return 1/(1 + math.exp(-1 * num))
+    return 1/(1 + math.exp(-20 * num))
 
 def amplitude(block):
     count = len(block)/2
@@ -73,6 +73,7 @@ def avgfreq(block):
         w = w / np.sum(w)
         freqdict = dict(zip(freqs, w))
         wsum = sum(w)
+        wsum = wsum if wsum != 0 else 1
 
         # print()
         # for i in freqdict:
