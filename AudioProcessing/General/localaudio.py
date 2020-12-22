@@ -19,7 +19,7 @@ CHANNELS = 1
 RATE = 44100
 CHUNK = 8192
 stream = mic.open(format=FORMAT, channels=CHANNELS, rate=RATE,
-                  input_device_index=0,
+                  input_device_index=3,
                   input=True, frames_per_buffer=CHUNK)
 
 '''
@@ -104,11 +104,13 @@ print("start main stream")
 try:
     while True:
         data = stream.read(CHUNK, exception_on_overflow=False)
+
         #amplitude
         amp = amplitude(data)
         freq = avgfreq(data)
-        print("|" * int(amp), "\n")
+        print("\n", "|" * int(amp), "\n")
 
+        #convert to int
         data = np.frombuffer(data, dtype=np.int16)
         filtered = filter(data, backint)
         amp2 = amplitude(filtered)
@@ -117,10 +119,12 @@ try:
         #write command to ardunio
         out = "<%s, %s, %s, %s, %s, %s>" % (amp, amp, amp, amp2, amp2, amp2)
         s.write(out.encode())
+
         # data = np.frombuffer(data, dtype='b')
         # result = np.fromstring(data, dtype=np.int16)
 except KeyboardInterrupt:
-    pass
+    out = "<%s, %s, %s, %s, %s, %s>" % (0, 0, 0, 0, 0, 0)
+    s.write(out.encode())
 
 stream.stop_stream()
 stream.close()
