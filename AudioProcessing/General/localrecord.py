@@ -74,7 +74,12 @@ wf.setframerate(RATE)
 wf.writeframes(b''.join(fb))
 wf.close()
 
-wavfile.write("filtered.wav", 44100, reduced_noise)
+wf = wave.open('filtered.wav', 'wb')
+wf.setnchannels(CHANNELS)
+wf.setsampwidth(2)
+wf.setframerate(RATE)
+wf.writeframes(reduced_noise.tobytes())
+wf.close()
 
 wf = wave.open('localrecord.wav', 'wb')
 wf.setnchannels(CHANNELS)
