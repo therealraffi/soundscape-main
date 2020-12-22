@@ -2,11 +2,12 @@ import pyaudio
 import struct
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy import signal
 import wave
 import math
 import time
 import json
+import noisereduce as nr
+import librosa
 
 mic = pyaudio.PyAudio()
 
@@ -15,7 +16,7 @@ CHANNELS = 1
 RATE = 44100
 CHUNK = 8192
 stream = mic.open(format=FORMAT, channels=CHANNELS, rate=RATE,
-                  input_device_index=3,
+                  input_device_index=0,
                   input=True, frames_per_buffer=CHUNK)
 
 '''
@@ -32,16 +33,34 @@ Quicktime Input
 Screen Record Audio
 '''
 
+t1 = time.time()
+
+print("start")
+fb = []
+bint = np.array([], dtype=np.int16)
+while(time.time() - t1 < 1):
+    data = stream.read(CHUNK, exception_on_overflow=False)
+    fb.append(data)
+    data = np.frombuffer(data, dtype=np.int16)
+    bint = np.append(bint, data)
+    pass
 
 init = time.time()
 fm = []
-
+fint = np.array([], dtype=np.int16)
+print("start main")
 try:
     while True:
         data = stream.read(CHUNK, exception_on_overflow=False)
         fm.append(data)
+        data = np.frombuffer(data, dtype=np.int16)
+        fint = np.append(fint, data)
 except KeyboardInterrupt:
     pass
+
+print()
+print("filter")
+reduced_noise = nr.reduce_noise(audio_clip=fint.astype('float32'), noise_clip=bint.astype('float32'), verbose=True)
 
 wf = wave.open('localrecord.wav', 'wb')
 wf.setnchannels(CHANNELS)

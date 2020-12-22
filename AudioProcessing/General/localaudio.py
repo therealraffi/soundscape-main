@@ -90,7 +90,7 @@ while True:
     data = stream.read(CHUNK, exception_on_overflow=False)
 
     #amplitude
-    amp = str(amplitude(data))
+    amp = amplitude(data)
     print(avgfreq(data), "\t", "|" * int(amp))
     out = "<%s, %s, %s, %s, %s, %s>" % (amp, amp, amp, amp, amp, amp)
     #write command to ardunio
