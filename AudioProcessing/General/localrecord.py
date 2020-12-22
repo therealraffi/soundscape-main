@@ -7,6 +7,7 @@ import math
 import time
 import json
 import noisereduce as nr
+from scipy.io import wavfile
 import librosa
 
 mic = pyaudio.PyAudio()
@@ -44,7 +45,7 @@ while(time.time() - t1 < 1):
     data = np.frombuffer(data, dtype=np.int16)
     bint = np.append(bint, data)
     pass
-
+print(bint, len(bint), min(bint), max(bint))
 init = time.time()
 fm = []
 fint = np.array([], dtype=np.int16)
@@ -60,7 +61,20 @@ except KeyboardInterrupt:
 
 print()
 print("filter")
-reduced_noise = nr.reduce_noise(audio_clip=fint.astype('float32'), noise_clip=bint.astype('float32'), verbose=True)
+reduced_noise = nr.reduce_noise(audio_clip=fint.astype('float32'), noise_clip=bint.astype('float32'), verbose=False).astype('int16')
+# print(reduced_noise)
+
+print(fint, len(fint), min(fint), max(fint))
+print(reduced_noise, len(reduced_noise), min(reduced_noise), max(reduced_noise))
+
+wf = wave.open('back.wav', 'wb')
+wf.setnchannels(CHANNELS)
+wf.setsampwidth(2)
+wf.setframerate(RATE)
+wf.writeframes(b''.join(fb))
+wf.close()
+
+wavfile.write("filtered.wav", 44100, reduced_noise)
 
 wf = wave.open('localrecord.wav', 'wb')
 wf.setnchannels(CHANNELS)
