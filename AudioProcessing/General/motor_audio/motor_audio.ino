@@ -14,9 +14,7 @@ boolean newData = false;
 void setup() {
   Serial.begin(9600);
   pinMode(3, OUTPUT); 
-  pinMode(5, OUTPUT);  
   pinMode(6, OUTPUT); 
-  pinMode(9, OUTPUT);  
   pinMode(10, OUTPUT); 
   pinMode(11, OUTPUT);  
 }
