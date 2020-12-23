@@ -28,3 +28,6 @@ Classifiers/ESC-50
 *.rar
 *.tar
 *.zip
+*.DS_Store
+*/.DS_Store
+.vscode

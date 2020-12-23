@@ -89,8 +89,7 @@ with socket.socket() as server_socket:
             f2.append(c2.tostring())
             f3.append(c3.tostring())
 
-            print(amplitude(f0[-1]), "\t", amplitude(f1[-1]), "\t", amplitude(f2[-1]), "\t", amplitude(f3[-1]))
-
+            print(amplitude(f0[-1]), avgfreq(f0[-1]), "\t", amplitude(f1[-1]), avgfreq(f1[-1]), "\t", amplitude(f2[-1]), avgfreq(f2[-1]), "\t", amplitude(f3[-1]), avgfreq(f3[-1]))
         except (socket.error, KeyboardInterrupt) as e:
             print("Client Disconnected")
 
