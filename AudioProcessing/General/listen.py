@@ -3,6 +3,11 @@ import pyaudio
 import numpy as np
 import struct
 import wave
+import math
+import time
+import json
+import noisereduce as nr
+
 # Socket
 HOST = "192.168.1.218"
 PORT = 10000
@@ -13,7 +18,7 @@ server_address = (HOST, PORT)
 sock.bind(server_address)
 sock.listen(1)
 
-CHUNK = 1024 * 4
+CHUNK = 1024 * 8
 FORMAT = pyaudio.paInt16
 CHANNELS = 4
 RATE = 44100
@@ -23,8 +28,12 @@ cRATE = 22050
 fm, f0, f1, f2, f3 = [], [], [], [], []
 stream = True
 
+def sig(num):
+    return 1/(1 + math.exp(-20 * num))
+
 def amplitude(block):
     count = len(block)/2
+    count = count if count != 0 else 1
     format = "%dh"%(count)
     shorts = struct.unpack(format, block)
 
@@ -33,7 +42,31 @@ def amplitude(block):
         n = sample * (1.0/32768.0)
         sum_squares += n**2
         
-    return 1000 * (sum_squares/count) ** 0.5
+    # return 100 * (sum_squares/count) ** 0.5
+    return int(2 * (100 * sig((sum_squares/count) ** 0.5) - 50))
+
+def avgfreq(block):
+        result = np.fromstring(block, dtype=np.int16)
+        w = np.fft.fft(result)
+        freqs = np.abs((np.fft.fftfreq(len(w))*44100))
+        w = np.abs(w)
+        indices = np.argsort(w)[int(len(w)*0.99):]
+        bin_const = 10
+        indices = indices[len(indices) % bin_const:]
+        w = w[indices]
+        freqs = freqs[indices]
+        w = w[np.argsort(freqs)]
+        freqs = np.sort(freqs)
+        w = np.reshape(w, (-1, bin_const)).sum(axis=1)
+        freqs = np.average(np.reshape(freqs, (-1, bin_const)), axis=1)
+        w = w / np.sum(w)
+        freqdict = dict(zip(freqs, w))
+        wsum = sum(w)
+        wsum = wsum if wsum != 0 else 1
+        out = 0
+        for i in range(len(w)):
+            out += w[i] * freqs[i] / wsum
+        return 0 if math.isnan(float(out)) else int(out)
 
 while stream:
     connection, client_address = sock.accept()

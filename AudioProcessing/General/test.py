@@ -1,10 +1,10 @@
-import sounddevice as sd
-import numpy as np
+import noisereduce as nr
+from scipy.io import wavfile
+import librosa
+# load data
+rate, data = wavfile.read("localrecord.wav")
+print(rate)
+noisy_part = data[100:1500]
+print(len(data), data.shape)
 
-def print_sound(indata, outdata, frames, time, status):
-    volume_norm = np.linalg.norm(indata)*10
-    print ("|" * int(volume_norm))
-
-with sd.Stream(callback=print_sound):
-    while(True):
-        pass
+reduced_noise = nr.reduce_noise(audio_clip=data.astype('float32'), noise_clip=noisy_part.astype('float32'), verbose=True)

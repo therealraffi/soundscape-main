@@ -4,7 +4,7 @@ import numpy as np
 import wave
 # Socket
 HOST = "192.168.1.218"
-PORT = 10000
+PORT = 10010
 
 # Audio
 p = pyaudio.PyAudio()
@@ -13,18 +13,6 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 4
 RATE = 44100
 cRATE = 22050
-
-stream = p.open(format=FORMAT,
-                channels=CHANNELS,
-                rate=RATE,
-                output=True,
-                frames_per_buffer=CHUNK)
-
-channel0 = p.open(format=FORMAT,
-                channels=1,
-                rate=cRATE,
-                output=True,
-                frames_per_buffer=1024)
 
 #record channel
 fm, f0, f1, f2, f3 = [], [], [], [], []
@@ -51,12 +39,8 @@ with socket.socket() as server_socket:
             f2.append(c2.tostring())
             f3.append(c3.tostring())
 
-            stream.write(data)
         except (socket.error, KeyboardInterrupt) as e:
             print("Client Disconnected")
-
-            stream.stop_stream()
-            stream.close()
             p.terminate()
 
             wf = wave.open('classpost.wav', 'wb')

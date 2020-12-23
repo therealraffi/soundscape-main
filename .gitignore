@@ -1,6 +1,7 @@
 # Don't track content of these folders
 venv/*
 env/*
+Classifiers/ESC-50
 # someOtherfoler/
 
 
