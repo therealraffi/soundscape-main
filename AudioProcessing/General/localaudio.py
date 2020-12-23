@@ -6,7 +6,7 @@ from scipy import signal
 import math
 import serial
 
-s = serial.Serial(port='/dev/tty.usbserial-14230', baudrate=9600)
+s = serial.Serial(port='/dev/tty.usbmodem141401', baudrate=9600)
 mic = pyaudio.PyAudio()
 
 FORMAT = pyaudio.paInt16
@@ -14,11 +14,11 @@ CHANNELS = 1
 RATE = 44100
 CHUNK = 8192
 stream = mic.open(format=FORMAT, channels=CHANNELS, rate=RATE,
-                  input_device_index=3,
+                  input_device_index=1,
                   input=True, frames_per_buffer=CHUNK)
 
 def sig(num):
-    return 1/(1 + math.exp(-30 * num))
+    return 1/(1 + math.exp(-10 * num))
 
 def get_rms(block):
     count = len(block)/2
