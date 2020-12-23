@@ -14,17 +14,12 @@ stream = p.open(format=pyaudio.paInt16, channels=1, rate=44100,
                 input=True, frames_per_buffer=CHUNKSIZE)
 
 # Wait to start recording
-
 result = np.array([], dtype=np.int16)
 
 try:
-
     print("Press [Ctrl] + [C] to stop recording")
-
     while True:
-
         # Get the last two chunks into numpydata
-
         data = stream.read(CHUNKSIZE)
         newdata = np.fromstring(data, dtype=np.int16)
         result = np.append(result, newdata)
