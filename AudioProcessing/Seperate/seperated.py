@@ -13,11 +13,6 @@ HOST = "192.168.1.218"
 PORT = 10000
 
 # Audio
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_address = (HOST, PORT)
-sock.bind(server_address)
-sock.listen(1)
-
 CHUNK = 1024 * 8
 FORMAT = pyaudio.paInt16
 CHANNELS = 4
@@ -26,7 +21,6 @@ cRATE = 22050
 
 #record channel
 fm, f0, f1, f2, f3 = [], [], [], [], []
-stream = True
 
 def sig(num):
     return 1/(1 + math.exp(-20 * num))
@@ -58,6 +52,10 @@ def avgfreq(block):
         w = w[np.argsort(freqs)]
         freqs = np.sort(freqs)
         w = np.reshape(w, (-1, bin_const)).sum(axis=1)
+
+        if len(freqs) == 0:
+            return None
+        
         freqs = np.average(np.reshape(freqs, (-1, bin_const)), axis=1)
         w = w / np.sum(w)
         freqdict = dict(zip(freqs, w))
@@ -68,22 +66,22 @@ def avgfreq(block):
             out += w[i] * freqs[i] / wsum
         return 0 if math.isnan(float(out)) else int(out)
 
-while stream:
-    connection, client_address = sock.accept()
-    data = connection.recv(8192)
+with socket.socket() as server_socket:
+    server_socket.bind((HOST, PORT))
+    server_socket.listen(1)
+    conn, address = server_socket.accept()
+    print("Connection from " + address[0] + ":" + str(address[1]))
+    data = conn.recv(8192)
 
     while data != "":
         try:
-            data = connection.recv(8192)
-            # print(np.sqrt(np.mean(data**2)))
-            # print("\n\n\n", abs(data[0]), data[0], "\n", data, "\n\n\n")
+            data = conn.recv(8192)
+
             channels = np.fromstring(data, dtype='int16')
             c0 = channels[0::8] #red
             c1 = channels[1::8] #green
             c2 = channels[2::8] #blue
             c3 = channels[3::8] #purple
-
-            # print(np.sqrt(np.mean(c0**2)), np.sqrt(np.mean(c1**2)), np.sqrt(np.mean(c2**2)), np.sqrt(np.mean(c3**2)))
 
             fm.append(data)
             f0.append(c0.tostring())
@@ -91,12 +89,12 @@ while stream:
             f2.append(c2.tostring())
             f3.append(c3.tostring())
 
-            print(int(amplitude(c0.tostring())), "\t", int(amplitude(c1.tostring())), "\t", int(amplitude(c2.tostring())), "\t", int(amplitude(c3.tostring())))
+            print(amplitude(f0[-1]), "\t", amplitude(f1[-1]), "\t", amplitude(f2[-1]), "\t", amplitude(f3[-1]))
 
         except (socket.error, KeyboardInterrupt) as e:
             print("Client Disconnected")
 
-            wf = wave.open('class.wav', 'wb')
+            wf = wave.open('combined.wav', 'wb')
             wf.setnchannels(4)
             wf.setsampwidth(2)
             wf.setframerate(RATE)
