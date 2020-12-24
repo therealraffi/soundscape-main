@@ -4,6 +4,7 @@ import pyaudio
 import numpy as np
 
 ip = socket.gethostbyname(socket.gethostname())
+
 while True:
     try:
         port = 10000

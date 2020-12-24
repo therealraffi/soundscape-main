@@ -24,7 +24,6 @@ def receive_server_data():
     while True:
         try:
             data = s.recv(8192)
-            playing_stream.write(data)
         except:
             pass
         
