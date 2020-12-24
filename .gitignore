@@ -3,13 +3,10 @@ venv/*
 env/*
 py16/*
 py37/*
-<<<<<<< HEAD
 
 **/ESC50
 Classifiers/ESC50/
-=======
 **/ESC-50
->>>>>>> 64db214425470207435a80fd0f61e3d7c7215fec
 **/chainer
 # someOtherfoler/
 
@@ -39,9 +36,9 @@ Classifiers/ESC50/
 *.hdf5
 *.wav
 *.pkl
-*.wav
 *.pkl
 *.hdf5
+*.pth
 *.DS_Store
 */.DS_Store
 **/.DS_Store
