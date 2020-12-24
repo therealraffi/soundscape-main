@@ -6,7 +6,7 @@ from scipy import signal
 import math
 import serial
 
-s = serial.Serial(port='/dev/tty.usbmodem141401', baudrate=9600)
+s = serial.Serial(port='/dev/tty.usbserial-14230', baudrate=9600)
 mic = pyaudio.PyAudio()
 
 FORMAT = pyaudio.paInt16
@@ -14,14 +14,29 @@ CHANNELS = 1
 RATE = 44100
 CHUNK = 8192
 stream = mic.open(format=FORMAT, channels=CHANNELS, rate=RATE,
-                  input_device_index=1,
+                  input_device_index=0,
                   input=True, frames_per_buffer=CHUNK)
+
+'''
+Built-in Input
+Built-in Output
+DisplayPort
+SteelSeries Arctis 1 Wireless
+MMAudio Device
+MMAudio Device (UI Sounds)
+Soundflower (2ch)
+Soundflower (64ch)
+ZoomAudioDevice
+Quicktime Input
+Screen Record Audio
+'''
 
 def sig(num):
     return 1/(1 + math.exp(-10 * num))
 
-def get_rms(block):
+def amplitude(block):
     count = len(block)/2
+    count = count if count != 0 else 1
     format = "%dh"%(count)
     shorts = struct.unpack(format, block)
 
@@ -33,16 +48,48 @@ def get_rms(block):
     # return 100 * (sum_squares/count) ** 0.5
     return int(2 * (100 * sig((sum_squares/count) ** 0.5) - 50))
 
+def avgfreq(block):
+        result = np.fromstring(block, dtype=np.int16)
+        w = np.fft.fft(result)
+        freqs = np.abs((np.fft.fftfreq(len(w))*44100))
+        w = np.abs(w)
+        indices = np.argsort(w)[int(len(w)*0.99):]
+        bin_const = 1
+        indices = indices[len(indices) % bin_const:]
+        w = w[indices]
+        freqs = freqs[indices]
+        w = w[np.argsort(freqs)]
+        freqs = np.sort(freqs)
+        w = np.reshape(w, (-1, bin_const)).sum(axis=1)
+        freqs = np.average(np.reshape(freqs, (-1, bin_const)), axis=1)
+        w = w / np.sum(w)
+        
+        freqdict = dict(zip(freqs, w))
+        freqdict = {k:v for k, v in freqdict.items() if v * 100 > 1}
+        
+        wsum = sum(freqdict.values())
+        wsum = wsum if wsum != 0 else 1
+
+        print()
+        for i in freqdict:
+            print(int(i), "\t", freqdict[i] * 100 / wsum)
+        print()
+
+        out = 0
+        for i in freqdict:
+            out += i * freqdict[i] / wsum
+
+        return None if math.isnan(float(out)) or len(freqdict) == 0 else max(1, int(out))
+
 while True:
     data = stream.read(CHUNK, exception_on_overflow=False)
-    # print(get_rms(data))
-    # print(data)
-    amp = str(get_rms(data))
-    out = "<%s, %s, %s, %s, %s, %s>" % (amp, amp, amp, amp, amp, amp)
-    s.write(out.encode())
-    data = np.frombuffer(data, dtype='b')
-    volume_norm = int(np.linalg.norm(data)/100)
-    print ("|" * int(amp))
+
+    amp = amplitude(data)
+    
+    # out = "<%s, %s, %s, %s, %s, %s>" % (amp, amp, amp, amp, amp, amp)
+    # s.write(out.encode())
+
+    print(avgfreq(data), "|" * amp)
     # print(volume_norm)
 
 stream.stop_stream()

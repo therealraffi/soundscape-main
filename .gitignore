@@ -1,7 +1,13 @@
 # Don't track content of these folders
 venv/*
 env/*
-Classifiers/ESC-50
+py16/*
+py37/*
+
+**/ESC50
+Classifiers/ESC50/
+**/ESC-50
+**/chainer
 # someOtherfoler/
 
 
@@ -14,7 +20,6 @@ Classifiers/ESC-50
 *.o
 *.so
 
-*.so
 
 # Packages #
 ############
@@ -28,6 +33,12 @@ Classifiers/ESC-50
 *.rar
 *.tar
 *.zip
+*.hdf5
+*.wav
+*.pkl
+*.pkl
+*.hdf5
+*.pth
 *.DS_Store
 */.DS_Store
-.vscode
+**/.DS_Store
