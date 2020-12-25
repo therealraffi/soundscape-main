@@ -29,14 +29,32 @@ while True:
         print("Couldn't connect to server")
 
 #plt
-plt.axis([-1.1, 1.1, -1.1, 1.1])
-ax = plt.gca()
-ax.spines['top'].set_color('none')
-ax.spines['bottom'].set_position('zero')
-ax.spines['left'].set_position('zero')
-ax.spines['right'].set_color('none')
-ax.add_artist(plt.Circle((0, 0), 1, color='b', fill=False))
-ax.set_aspect("equal")
+# plt.axis([-1.1, 1.1, -1.1, 1.1])
+# ax = plt.gca()
+# ax.spines['top'].set_color('none')
+# ax.spines['bottom'].set_position('zero')
+# ax.spines['left'].set_position('zero')
+# ax.spines['right'].set_color('none')
+# ax.add_artist(plt.Circle((0, 0), 1, color='b', fill=False))
+# ax.set_aspect("equal")
+
+def firejson(plot, colors):
+    visible = ['false'] * 4
+    for i in colors:
+        visible[int(i[1]) - 1] = 'true'
+
+    out = ""
+    plotind = 0
+
+    for i in range(4):
+        if visible[i] == 'false':
+            out += "'sound%s': {'cords': '%f %f', 'visibility' : 'false'}, " % (i + 1, 0, 0)
+        else:
+            col = colors[plotind]
+            out += "'sound%s': {'cords': '%f %f', 'visibility' : 'true'}, " % (i + 1, plot[plotind][0], plot[plotind][1])
+            plotind += 1
+    
+    return "{" + out[:-2] + "}"
 
 while True:
     data = s.recv(8192)
@@ -48,7 +66,7 @@ while True:
         zc = re.findall(r'"z": (.*?),', result)
         points = []
         ind = []
-        colors = ["r", "g", "b", "m"]
+        colors = ["r1", "g2", "b3", "m4"]
 
         for i in range(len(xc)):
             x = float(xc[i])
@@ -71,13 +89,19 @@ while True:
             angle *= math.pi/180
             plot.append([math.cos(angle), math.sin(angle)])
             
-        plot = np.array(plot)
-        plot = plt.scatter(plot[:, 0], plot[:, 1], c=ind, s = 50)
-        plt.pause(0.00001)
-        plot.remove()
+        fire = eval(firejson(plot, ind))
+        ref.set(fire)
+
+        # print("wew")
+        #graph
+        # plot = np.array(plot)
+        # plot = plt.scatter(plot[:, 0], plot[:, 1], c=ind, s = 50)
+        # plt.pause(0.00001)
+        # plot.remove()
+
     except KeyboardInterrupt as e:
         break
     except Exception as e:
-        pass
+        print(e)
 
-plt.show()
+# plt.show()
