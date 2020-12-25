@@ -20,11 +20,18 @@ while True:
     except:
         print("Couldn't connect to server")
 
+def save(name, channels, rate, frames):
+    wf = wave.open(name, 'wb')
+    wf.setnchannels(channels)
+    wf.setsampwidth(2)
+    wf.setframerate(rate)
+    wf.writeframes(b''.join(frames))
+    wf.close()
+
 def receive_server_data():
     while True:
         try:
             data = s.recv(8192)
-            playing_stream.write(data)
         except:
             pass
         
@@ -34,20 +41,13 @@ channels = 1
 RATE = 44100
 cRATE = 22050
 
-# initialise microphone recording
-p = pyaudio.PyAudio()
-# playing_stream = p.open(format=audio_format, channels=channels, rate=rate, output=True, frames_per_buffer=chunk_size)
-
 print("Connected to Server")
 
-# start threads
-# receive_thread = threading.Thread(target=receive_server_data).start()
-
 fm, f0, f1, f2, f3 = [], [], [], [], []
+
 while True:
     try:
         data = s.recv(8192)
-        # playing_stream.write(data)
     
         channels = np.fromstring(data, dtype='int16')
         c0 = channels[0::8] #red
@@ -64,40 +64,12 @@ while True:
     except KeyboardInterrupt as e:
         print("Client Disconnected")
 
-        wf = wave.open('combined.wav', 'wb')
-        wf.setnchannels(4)
-        wf.setsampwidth(2)
-        wf.setframerate(RATE)
-        wf.writeframes(b''.join(fm))
-        wf.close()
+        save("combined.wav", 4, RATE, fm)
 
-        wf = wave.open('channel0.wav', 'wb')
-        wf.setnchannels(1)
-        wf.setsampwidth(2)
-        wf.setframerate(cRATE)
-        wf.writeframes(b''.join(f0))
-        wf.close()
+        save("channel0.wav", 1, cRATE, f0)
+        save("channel1.wav", 1, cRATE, f1)
+        save("channel2.wav", 1, cRATE, f2)
+        save("channel3.wav", 1, cRATE, f3)
 
-        wf1 = wave.open('channel1.wav', 'wb')
-        wf1.setnchannels(1)
-        wf1.setsampwidth(2)
-        wf1.setframerate(cRATE)
-        wf1.writeframes(b''.join(f1))
-        wf1.close()
-
-        wf2 = wave.open('channel2.wav', 'wb')
-        wf2.setnchannels(1)
-        wf2.setsampwidth(2)
-        wf2.setframerate(cRATE)
-        wf2.writeframes(b''.join(f2))
-        wf2.close()
-
-        wf3 = wave.open('channel3.wav', 'wb')
-        wf3.setnchannels(1)
-        wf3.setsampwidth(2)
-        wf3.setframerate(cRATE)
-        wf3.writeframes(b''.join(f3))
-        wf3.close()
-        print("done saving")
-        stream = False
+        print("Done Saving")
         break
