@@ -29,20 +29,10 @@ while True:
     except:
         print("Couldn't connect to server")
 
-#plt
-# plt.axis([-1.1, 1.1, -1.1, 1.1])
-# ax = plt.gca()
-# ax.spines['top'].set_color('none')
-# ax.spines['bottom'].set_position('zero')
-# ax.spines['left'].set_position('zero')
-# ax.spines['right'].set_color('none')
-# ax.add_artist(plt.Circle((0, 0), 1, color='b', fill=False))
-# ax.set_aspect("equal")
-
 def firejson(plot, colors):
     visible = ['false'] * 4
     for i in colors:
-        visible[int(i[1]) - 1] = 'true'
+        visible[int(i[1])] = 'true'
 
     out = ""
     plotind = 0
@@ -59,10 +49,23 @@ def firejson(plot, colors):
 
 data = ""
 
+#plt
+# plt.axis([-1.1, 1.1, -1.1, 1.1])
+# ax = plt.gca()
+# ax.spines['top'].set_color('none')
+# ax.spines['bottom'].set_position('zero')
+# ax.spines['left'].set_position('zero')
+# ax.spines['right'].set_color('none')
+# ax.add_artist(plt.Circle((0, 0), 1, color='b', fill=False))
+# ax.set_aspect("equal")
+
 def getdata():
     global data
     while True:
-        data = s.recv(8192)
+        try:
+            data = s.recv(8192)
+        except KeyboardInterrupt as e:
+            break
 
 def listen():
     global data
@@ -75,7 +78,7 @@ def listen():
             zc = re.findall(r'"z": (.*?),', result)
             points = []
             ind = []
-            colors = ["r1", "g2", "b3", "m4"]
+            colors = ["r0", "g1", "b2", "m3"]
 
             for i in range(len(xc)):
                 x = float(xc[i])
@@ -99,10 +102,9 @@ def listen():
                 plot.append([math.cos(angle), math.sin(angle)])
                 
             fire = eval(firejson(plot, ind))
-            print(fire)
+            # print(fire)
             ref.set(fire)
 
-            # print("wew")
             #graph
             # plot = np.array(plot)
             # plot = plt.scatter(plot[:, 0], plot[:, 1], c=ind, s = 50)
