@@ -1,10 +1,26 @@
-import noisereduce as nr
-from scipy.io import wavfile
-import librosa
-# load data
-rate, data = wavfile.read("localrecord.wav")
-print(rate)
-noisy_part = data[100:1500]
-print(len(data), data.shape)
+import speech_recognition as sr
 
-reduced_noise = nr.reduce_noise(audio_clip=data.astype('float32'), noise_clip=noisy_part.astype('float32'), verbose=True)
+'''
+Built-in Input
+Built-in Output
+DisplayPort
+SteelSeries Arctis 1 Wireless
+MMAudio Device
+MMAudio Device (UI Sounds)
+Soundflower (2ch)
+Soundflower (64ch)
+ZoomAudioDevice
+Quicktime Input
+Screen Record Audio
+'''
+r = sr.Recognizer()
+mic = sr.Microphone(device_index=3)
+
+with mic as source:
+    while True:
+        audio = r.listen(source)
+        print(audio)
+        try:
+            print(r.recognize_google(audio))
+        except:
+            pass

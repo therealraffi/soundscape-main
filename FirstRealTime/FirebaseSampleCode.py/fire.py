@@ -33,8 +33,5 @@ ref.set({
         'visibility':'false',
         'color':'#ff4646'
     },
-
 })
 print(ref.get())
-
-

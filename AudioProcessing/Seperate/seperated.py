@@ -22,6 +22,14 @@ cRATE = 22050
 #record channel
 fm, f0, f1, f2, f3 = [], [], [], [], []
 
+def save(name, channels, rate, frames):
+    wf = wave.open(name, 'wb')
+    wf.setnchannels(channels)
+    wf.setsampwidth(2)
+    wf.setframerate(rate)
+    wf.writeframes(b''.join(frames))
+    wf.close()
+
 def sig(num):
     return 1/(1 + math.exp(-20 * num))
 
@@ -93,41 +101,13 @@ with socket.socket() as server_socket:
         except (socket.error, KeyboardInterrupt) as e:
             print("Client Disconnected")
 
-            wf = wave.open('combined.wav', 'wb')
-            wf.setnchannels(4)
-            wf.setsampwidth(2)
-            wf.setframerate(RATE)
-            wf.writeframes(b''.join(fm))
-            wf.close()
+            save("combined.wav", 4, RATE, fm)
 
-            wf = wave.open('out0.wav', 'wb')
-            wf.setnchannels(1)
-            wf.setsampwidth(2)
-            wf.setframerate(cRATE)
-            wf.writeframes(b''.join(f0))
-            wf.close()
+            save("out0.wav", 1, cRATE, f0)
+            save("out1.wav", 1, cRATE, f1)
+            save("out2.wav", 1, cRATE, f2)
+            save("out3.wav", 1, cRATE, f3)
 
-            wf1 = wave.open('out1.wav', 'wb')
-            wf1.setnchannels(1)
-            wf1.setsampwidth(2)
-            wf1.setframerate(cRATE)
-            wf1.writeframes(b''.join(f1))
-            wf1.close()
-
-            wf2 = wave.open('out2.wav', 'wb')
-            wf2.setnchannels(1)
-            wf2.setsampwidth(2)
-            wf2.setframerate(cRATE)
-            wf2.writeframes(b''.join(f2))
-            wf2.close()
-
-            wf3 = wave.open('out3.wav', 'wb')
-            wf3.setnchannels(1)
-            wf3.setsampwidth(2)
-            wf3.setframerate(cRATE)
-            wf3.writeframes(b''.join(f3))
-            wf3.close()
-            print("done saving")
-            stream = False
+            print("Done Saving")
             break
         

@@ -1,34 +1,15 @@
-import numpy as np
-import wave
-import librosa
-import struct
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
 
-FILE_NAME = "jagger.wav"
+# Fetch the service account key JSON file contents
+cred = credentials.Certificate('soundy-8d98a-firebase-adminsdk-o03jf-c7fede8ea2.json')
 
-floating = librosa.core.load(FILE_NAME, 44100)
+# Initialize the app with a service account, granting admin privileges
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://soundy-8d98a-default-rtdb.firebaseio.com/'
+})
 
-wf = wave.open(FILE_NAME, 'rb')
-
-(nchannels, sampwidth, framerate, nframes, comptype, compname) = wf.getparams()
-print('- input file config -')
-print('nchannels', nchannels)
-print('sampwidth', sampwidth)
-print('framerate', framerate)
-print('nframes', nframes)
-print('comptype', comptype)
-print('compname', compname)
-
-
-frames = wf.readframes(nframes * nchannels)
-# h = short (signed 16 bit)
-out = struct.unpack_from ("%dh" % nframes * nchannels, frames)
-mono = np.array(out)
-
-# 2 ^ 16 = 65536 -> [-32768, 32767]
-# librosa simply scale by dividing each entry by 32768
-scaled = mono / 32768
-print(scaled.shape)
-print('\n- conversion from PCM to floating point time series -');
-print('librosa', np.min(floating[0]), np.max(floating[0]))
-print('PCM', np.min(mono), np.max(mono))
-print('scaled PCM', np.min(scaled), np.max(scaled))
+# As an admin, the app has access to read and write all data, regradless of Security Rules
+ref = db.reference('Sound')
+print(ref.child("sound1").child("content").set("woah"))

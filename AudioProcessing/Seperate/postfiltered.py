@@ -20,6 +20,14 @@ cRATE = 22050
 #record channel
 fm, f0, f1, f2, f3 = [], [], [], [], []
 
+def save(name, channels, rate, frames):
+    wf = wave.open(name, 'wb')
+    wf.setnchannels(channels)
+    wf.setsampwidth(2)
+    wf.setframerate(rate)
+    wf.writeframes(b''.join(frames))
+    wf.close()
+
 def sig(num):
     return 1/(1 + math.exp(-10 * num))
 
@@ -90,42 +98,15 @@ with socket.socket() as server_socket:
 
             print(amplitude(f0[-1]), avgfreq(f0[-1]), "\t", amplitude(f1[-1]), avgfreq(f1[-1]), "\t", amplitude(f2[-1]), avgfreq(f2[-1]), "\t", amplitude(f3[-1]), avgfreq(f3[-1]))
         except (socket.error, KeyboardInterrupt) as e:
-            print("Client Disconnected")
-            p.terminate()
+            print("Client Disconnected") 
+            
+            save("combinedpost.wav", 4, RATE, fm)
 
-            wf = wave.open('combinedpost.wav', 'wb')
-            wf.setnchannels(4)
-            wf.setsampwidth(p.get_sample_size(FORMAT))
-            wf.setframerate(RATE)
-            wf.writeframes(b''.join(fm))
-            wf.close()
+            save("post0.wav", 1, cRATE, f0)
+            save("post1.wav", 1, cRATE, f1)
+            save("post2.wav", 1, cRATE, f2)
+            save("post3.wav", 1, cRATE, f3)
 
-            wf = wave.open('post0.wav', 'wb')
-            wf.setnchannels(1)
-            wf.setsampwidth(p.get_sample_size(FORMAT))
-            wf.setframerate(cRATE)
-            wf.writeframes(b''.join(f0))
-            wf.close()
-
-            wf1 = wave.open('post1.wav', 'wb')
-            wf1.setnchannels(1)
-            wf1.setsampwidth(p.get_sample_size(FORMAT))
-            wf1.setframerate(cRATE)
-            wf1.writeframes(b''.join(f1))
-            wf1.close()
-
-            wf2 = wave.open('post2.wav', 'wb')
-            wf2.setnchannels(1)
-            wf2.setsampwidth(p.get_sample_size(FORMAT))
-            wf2.setframerate(cRATE)
-            wf2.writeframes(b''.join(f2))
-            wf2.close()
-
-            wf3 = wave.open('post3.wav', 'wb')
-            wf3.setnchannels(1)
-            wf3.setsampwidth(p.get_sample_size(FORMAT))
-            wf3.setframerate(cRATE)
-            wf3.writeframes(b''.join(f3))
-            wf3.close()
+            print("Done Saving")
             break
         
