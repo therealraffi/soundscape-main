@@ -5,7 +5,6 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 from google.cloud import speech
-import pyaudio
 from six.moves import queue
 import socket
 import wave
@@ -95,7 +94,7 @@ class ResumableMicrophoneStream:
 
     def _fill_buffer(self, in_data, *args, **kwargs):
         self._buff.put(in_data)
-        return None, pyaudio.paContinue
+        return None, None
 
     def generator(self):
         while not self.closed:
