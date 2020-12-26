@@ -11,6 +11,7 @@ crow
 rain
 sea_waves
 crackling_fire
+crickets
 chirping_birds
 water_drops
 wind

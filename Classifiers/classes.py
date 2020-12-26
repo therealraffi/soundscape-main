@@ -1,5 +1,5 @@
-file_name = "ESC-classes.txt"
-out_file = "es-classes.txt"
+file_name = "esc.txt"
+out_file = "ESC-classes.txt"
 
 recorded = set()
 classes = []
