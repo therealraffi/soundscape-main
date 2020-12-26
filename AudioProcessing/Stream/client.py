@@ -56,10 +56,10 @@ while True:
         c3 = channels[3::8] #purple
 
         fm.append(data)
-        f0.append(c0.tostring())
-        f1.append(c1.tostring())
-        f2.append(c2.tostring())
-        f3.append(c3.tostring())
+        f0.append(c0.tobytes())
+        f1.append(c1.tobytes())
+        f2.append(c2.tobytes())
+        f3.append(c3.tobytes())
 
     except KeyboardInterrupt as e:
         print("Client Disconnected")
