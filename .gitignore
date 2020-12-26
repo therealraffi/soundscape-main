@@ -34,7 +34,6 @@ Classifiers/ESC50/
 *.tar
 *.zip
 *.hdf5
-*.wav
 *.pkl
 *.pkl
 *.hdf5
