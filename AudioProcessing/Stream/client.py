@@ -10,12 +10,9 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 while True:
     try:
-        #self.target_ip = input('Enter IP address of server --> ')
-        #self.target_port = int(input('Enter target port of server --> '))
         target_ip = "173.66.155.183"
         target_port = 10000
         s.connect((target_ip, target_port))
-
         break
     except:
         print("Couldn't connect to server")
@@ -60,6 +57,8 @@ while True:
         f1.append(c1.tobytes())
         f2.append(c2.tobytes())
         f3.append(c3.tobytes())
+
+        f3[-1]
 
     except KeyboardInterrupt as e:
         print("Client Disconnected")
