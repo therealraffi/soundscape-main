@@ -221,6 +221,8 @@ def graph():
                 plot.append([math.cos(angle), math.sin(angle)])
             
             angles = temp
+
+            #Firebase
             fire = eval(firejson(plot, ind))
             ref.set(fire)
         except KeyboardInterrupt as e:
@@ -275,10 +277,10 @@ def avgfreq(block):
         wsum = sum(freqdict.values())
         wsum = wsum if wsum != 0 else 1
 
-        print()
-        for i in freqdict:
-            print(int(i), "\t", freqdict[i] * 100 / wsum)
-        print()
+        # print()
+        # for i in freqdict:
+        #     print(int(i), "\t", freqdict[i] * 100 / wsum)
+        # print()
 
         out = 0
         for i in freqdict:
@@ -307,7 +309,8 @@ def arduino():
         for c in range(len(angles) - 1, -1, -1):
             i = angles[c]
             if (180 - ignore)/2 < i[0] < (180 + ignore)/2:
-                del angles[i]
+                print(i)
+                del angles[c]
 
         amps = [0] * 6
         inc = (360 - ignore) / 5
@@ -315,20 +318,13 @@ def arduino():
         possible = [(180 + ignore)/2 + i * inc for i in range(5)]
         possible.insert(0, (180 - ignore)/2)
 
-        for i, color in angles:
+        for angle, channel in angles:
             ind = 0
             for c, k in enumerate(possible):
-                if k - inc/2 <= i <= k + inc/2:
+                if k - inc/2 <= angle <= k + inc/2:
                     ind = c
                     if amps[ind] != 0:
-                        if ind == 0:
-                            if amps[1] == 0:
-                                ind = 1
-                                break
-                            if amps[5] == 0:
-                                ind = 5
-                                break
-                        elif ind == 5:
+                        if ind == 5:
                             if amps[0] == 0:
                                 ind = 0
                                 break
@@ -342,7 +338,9 @@ def arduino():
                             if amps[ind - 1] == 0:
                                 ind -= 1
                                 break
-            amps[ind] = max(analysis[color][0], 1)
+                    else:
+                        break
+            amps[ind] = max(analysis[channel][0], 1)
 
         print(angles)
         print(analysis)
@@ -353,20 +351,24 @@ def arduino():
         s.write(out.encode())
 
 if __name__ == "__main__": 
-    t1 = threading.Thread(target=sep) 
+    t1 = threading.Thread(target=sep)
     t2 = threading.Thread(target=post) 
     t3 = threading.Thread(target=position) 
     t4 = threading.Thread(target=graph) 
     t5 = threading.Thread(target=arduino) 
 
-    t1.start() 
-    t2.start() 
-    t3.start() 
-    t4.start() 
-    t5.start() 
+    try:
+        t1.start() 
+        t2.start() 
+        t3.start() 
+        t4.start() 
+        t5.start() 
+
+        t1.join() 
+        t2.join() 
+        t3.join() 
+        t4.join() 
+        t5.join() 
+    except:
+        print("\n\n\n\n\n\n\n\nEnd")
   
-    t1.join() 
-    t2.join() 
-    t3.join() 
-    t4.join() 
-    t5.join() 

@@ -10,9 +10,6 @@ import socket
 import wave
 import numpy as np
 import threading
-import os
-
-# os.system("export GOOGLE_APPLICATION_CREDENTIALS='/Users/nafi/Develop/GitHub/ISEF2021/AudioProcessing/Stream/Audio-33662799f829.json'")
 
 #Firebase
 cred = credentials.Certificate('soundy-8d98a-firebase-adminsdk-o03jf-c7fede8ea2.json')
@@ -31,7 +28,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 #Global Vars
 fm = []
-channelframes = [[], [], [], []]
+fc = []
 finalspeech = ""
 
 while True:
@@ -43,20 +40,13 @@ while True:
     except:
         print("Couldn't connect to server")
 
-def getsound():
-    global fm
-    while True:
-        data = s.recv(8192)
-        fm.append(data)
-
 def get_current_time():
     return int(round(time.time() * 1000))
 
 class ResumableMicrophoneStream:
-    def __init__(self, rate, chunk_size, channelnum):
+    def __init__(self, rate, chunk_size):
         def init():
             self._rate = rate
-            self.channelnum = channelnum
             self.chunk_size = chunk_size
             self._num_channels = 1
             self._buff = queue.Queue()
@@ -74,20 +64,20 @@ class ResumableMicrophoneStream:
             self.prevlen = 0
 
         def sound():
-            global fm
             while True:
-                if self.prevlen != len(fm):                
-                    back = len(fm) - self.prevlen
+                data = s.recv(8192)
+                fm.append(data)
 
-                    fc = channelframes[self.channelnum]
-                    channels = np.frombuffer(b''.join(fm[-back:]), dtype='int16')
-                    channels = channels[self.channelnum::8].tobytes()
-                    fc.append(channels)
+                channels = np.frombuffer(data, dtype='int16')
+                channels = channels[0::8].tobytes()
+                fc.append(channels)
 
-                    # print([len(i) for i in channelframes], len(fm), back)
+                # back = len(fc) - self.prevlen
+                # channels = b''.join(fc[-back:])
+                # print(back)
 
-                    self._fill_buffer(channels)
-                    self.prevlen = len(fm)
+                self._fill_buffer(channels)
+                self.prevlen = len(fc)
 
         t1 = threading.Thread(target=init) 
         t2 = threading.Thread(target=sound) 
@@ -147,7 +137,7 @@ class ResumableMicrophoneStream:
                     break
             yield b"".join(data)
 
-def listen_print_loop(responses, stream, channelnum):
+def listen_print_loop(responses, stream):
     global finalspeech  
     for response in responses:
         if get_current_time() - stream.start_time > STREAMING_LIMIT:
@@ -176,17 +166,11 @@ def listen_print_loop(responses, stream, channelnum):
             + (STREAMING_LIMIT * stream.restart_counter)
         )
 
-        ref.child("sound" + str(channelnum + 1)).child("content").set(transcript)
-
+        ref.child("sound1").child("content").set(transcript)
         if result.is_final:
-            #where speech is finalized
-            print(channelnum, transcript)
-
-            #Temp sys.stdout.write("\033[K")
-            
+            sys.stdout.write("\033[K")
             # sys.stdout.write(str(corrected_time) + ": " + transcript + "\n")
-
-            #Temp sys.stdout.write(transcript + "\n")
+            sys.stdout.write(transcript + "\n")
 
             stream.is_final_end_time = stream.result_end_time
             stream.last_transcript_was_final = True
@@ -194,13 +178,13 @@ def listen_print_loop(responses, stream, channelnum):
             # Exit recognition if any of the transcribed phrases could be
             # one of our keywords.
             if re.search(r"\b(exit|quit)\b", transcript, re.I):
-                #Temp sys.stdout.write("Exiting...\n")
+                sys.stdout.write("Exiting...\n")
                 stream.closed = True
                 break
         else:
-            #Temp sys.stdout.write("\033[K")
+            sys.stdout.write("\033[K")
             # sys.stdout.write(str(corrected_time) + ": " + transcript + "\r")
-            #Temp sys.stdout.write(transcript + "\r")
+            sys.stdout.write(transcript + "\r")
             stream.last_transcript_was_final = False
 
 def save(name, channels, rate, frames):
@@ -211,7 +195,7 @@ def save(name, channels, rate, frames):
     wf.writeframes(b''.join(frames))
     wf.close()
 
-def main(channelnum):
+def main():
     client = speech.SpeechClient()
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
@@ -224,7 +208,7 @@ def main(channelnum):
         config=config, interim_results=True
     )
 
-    mic_manager = ResumableMicrophoneStream(SAMPLE_RATE, CHUNK_SIZE, channelnum)
+    mic_manager = ResumableMicrophoneStream(SAMPLE_RATE, CHUNK_SIZE)
     print("Start Voice Recognition")
 
     with mic_manager as stream:
@@ -240,7 +224,7 @@ def main(channelnum):
 
                 responses = client.streaming_recognize(streaming_config, requests)
 
-                listen_print_loop(responses, stream, channelnum)
+                listen_print_loop(responses, stream)
 
                 if stream.result_end_time > 0:
                     stream.final_request_end_time = stream.is_final_end_time
@@ -253,32 +237,9 @@ def main(channelnum):
                     sys.stdout.write("\n")
                 stream.new_stream = True
         except KeyboardInterrupt:
+            save("speech.wav", 4, 44100, fm)   
+            save("speechchannel.wav", 1, 44100//2, fc)   
+            print("Saved")
             return         
 
-if __name__ == "__main__": 
-    t0 = threading.Thread(target=getsound)
-    t1 = threading.Thread(target=main, kwargs={'channelnum': 0})
-    t2 = threading.Thread(target=main, kwargs={'channelnum': 1})
-    # t3 = threading.Thread(target=main, kwargs={'channelnum': 2})
-    # t4 = threading.Thread(target=main, kwargs={'channelnum': 3})
-
-    try:
-        t0.start()
-        t1.start() 
-        t2.start() 
-        # t3.start() 
-        # t4.start() 
-
-        t0.join()
-        t1.join() 
-        t2.join() 
-        # t3.join() 
-        # t4.join() 
-    except:
-        save("speech.wav", 4, 44100, fm)   
-        save("speechchannel0.wav", 1, 44100//2, channelframes[0])  
-        save("speechchannel1.wav", 1, 44100//2, channelframes[1]) 
-        # save("speechchannel2.wav", 1, 44100//2, channelframes[2]) 
-        # save("speechchannel3.wav", 1, 44100//2, channelframes[3])  
-
-        print("\n\nSaved\n\n\n\n\n\nEnd")
+main()
