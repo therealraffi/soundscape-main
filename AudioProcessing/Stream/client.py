@@ -49,7 +49,7 @@ while True:
     try:
         data = s.recv(8192)
     
-        channels = np.fromstring(data, dtype='int16')
+        channels = np.frombuffer(data, dtype='int16')
         c0 = channels[0::8] #red
         c1 = channels[1::8] #green
         c2 = channels[2::8] #blue
