@@ -22,6 +22,7 @@ firebase_admin.initialize_app(cred, {
 
 #Global Data Vars
 graphdata = b""
+sepdata = b""
 postdata = b""
 angles = []
 
@@ -55,10 +56,11 @@ def sep():
                     pass
 
     def handle_client(c, addr):
+        global sepdata
         while True:
             try:
-                data = c.recv(8192)
-                broadcast(c, data)
+                sepdata = c.recv(8192)
+                broadcast(c, sepdata)
             except socket.error:
                 c.close()
 
@@ -227,7 +229,7 @@ def graph():
             pass
             
 def sig(num):
-    return 1/(1 + math.exp(-10 * num))
+    return 1/(1 + math.exp(-20 * num))
 
 def amplitude(block):
     count = len(block)/2
@@ -287,12 +289,12 @@ def avgfreq(block):
 #print("%3s %6s \t %3s %6s \t %3s %6s \t %3s %6s" % (amplitude(f0[-1]), avgfreq(f0[-1]), amplitude(f1[-1]), avgfreq(f1[-1]), amplitude(f2[-1]), avgfreq(f2[-1]), amplitude(f3[-1]), avgfreq(f3[-1])), amp * "|")
 
 def arduino():
-    global postdata
+    global sepdata
     global angles
-    s = serial.Serial(port='/dev/tty.usbserial-14230', baudrate=9600)
+    s = serial.Serial(port='/dev/tty.usbserial-14230', baudrate=115200)
 
     while True:
-        channels = np.frombuffer(postdata, dtype='int16')
+        channels = np.frombuffer(sepdata, dtype='int16')
         c0 = channels[0::8].tobytes() #red
         c1 = channels[1::8].tobytes() #green
         c2 = channels[2::8].tobytes() #blue
@@ -347,8 +349,8 @@ def arduino():
         print(amps)
         print("\n\n")
 
-        # out = "<%s, %s, %s, %s, %s, %s>" % (amps[0], amp[1], amp[2], amp[3], amp[4], amp[5])
-        # s.write(out.encode())
+        out = "<%s, %s, %s, %s, %s, %s>" % (amps[0], amps[1], amps[2], amps[3], amps[4], amps[5])
+        s.write(out.encode())
 
 if __name__ == "__main__": 
     t1 = threading.Thread(target=sep) 
