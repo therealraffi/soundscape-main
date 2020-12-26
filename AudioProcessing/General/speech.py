@@ -74,8 +74,8 @@ class ResumableMicrophoneStream:
 
                 back = len(f0) - self.prevlen
                 c0 = b''.join(f0[-back:])
+
                 self._fill_buffer(c0)
-                
                 self.prevlen = len(f0)
 
         t1 = threading.Thread(target=init) 
@@ -118,8 +118,8 @@ class ResumableMicrophoneStream:
                 self.new_stream = False
 
             chunk = self._buff.get()
-            # chunk = s.recv(8192)
             self.audio_input.append(chunk)
+
             if chunk is None:
                 return
 
@@ -165,6 +165,7 @@ def listen_print_loop(responses, stream):
             + (STREAMING_LIMIT * stream.restart_counter)
         )
 
+        ref.child("sound1").child("content").set(transcript)
         if result.is_final:
             sys.stdout.write("\033[K")
             # sys.stdout.write(str(corrected_time) + ": " + transcript + "\n")
@@ -172,7 +173,6 @@ def listen_print_loop(responses, stream):
 
             stream.is_final_end_time = stream.result_end_time
             stream.last_transcript_was_final = True
-            ref.child("sound1").child("content").set(finalspeech)
 
             # Exit recognition if any of the transcribed phrases could be
             # one of our keywords.
