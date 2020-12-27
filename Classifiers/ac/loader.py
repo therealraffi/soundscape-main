@@ -108,7 +108,7 @@ if __name__ == "__main__":
 	for c in open(CLASS_PATH, 'r'):
 		classes.append(c)
 
-	filename = "../ESC50/audio/2-54962-A-23.wav"
+	filename = "baby_cry.wav"
 	#test(model, device, classes, params)
 	print('Classification')
 	predict(model, device, classes, filename)
