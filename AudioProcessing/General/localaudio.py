@@ -86,8 +86,8 @@ while True:
 
     amp = amplitude(data)
     
-    # out = "<%s, %s, %s, %s, %s, %s>" % (amp, amp, amp, amp, amp, amp)
-    # s.write(out.encode())
+    out = "<%s, %s, %s, %s, %s, %s>" % (amp, amp, amp, amp, amp, amp)
+    s.write(out.encode())
 
     print(avgfreq(data), "|" * amp)
     # print(volume_norm)

@@ -102,7 +102,6 @@ def listen():
                 plot.append([math.cos(angle), math.sin(angle)])
                 
             fire = eval(firejson(plot, ind))
-            # print(fire)
             ref.set(fire)
 
             #graph
