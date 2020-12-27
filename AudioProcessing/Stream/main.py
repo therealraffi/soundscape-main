@@ -33,8 +33,9 @@ def sep():
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.bind((ip, port))
             break
-        except:
-            print("Couldn't bind to that port")
+        except Exception as e:
+            # print(e)
+            print("Couldn't bind to that port 10000")
 
     def accept_connections():
         s.listen(100)
@@ -75,7 +76,7 @@ def post():
             s.bind((ip, port))
             break
         except:
-            print("Couldn't bind to that port")
+            print("Couldn't bind to that port 10010")
 
     def accept_connections():
         s.listen(100)
@@ -158,7 +159,7 @@ def position():
 
             break
         except:
-            print("Couldn't connect to server")
+            print("Couldn't connect to server 9000")
 
     while True:
         graphdata = s.recv(8192)
@@ -295,60 +296,65 @@ def arduino():
     global angles
     s = serial.Serial(port='/dev/tty.usbserial-14230', baudrate=115200)
 
+    sound = db.reference('Sound')   
     while True:
-        channels = np.frombuffer(sepdata, dtype='int16')
-        c0 = channels[0::8].tobytes() #red
-        c1 = channels[1::8].tobytes() #green
-        c2 = channels[2::8].tobytes() #blue
-        c3 = channels[3::8].tobytes() #purple
+        try:
+            channels = np.frombuffer(sepdata, dtype='int16')
+            c0 = channels[0::8].tobytes() #red
+            c1 = channels[1::8].tobytes() #green
+            c2 = channels[2::8].tobytes() #blue
+            c3 = channels[3::8].tobytes() #purple
 
-        analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
+            #analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
+            analysis = [[sound.child("sound%s" % (i)).child("amplitude").get(), sound.child("sound%s" % (i)).child("frequency").get()] for i in range(1, 5)]
 
-        ignore = 120
+            ignore = 120
 
-        for c in range(len(angles) - 1, -1, -1):
-            i = angles[c]
-            if (180 - ignore)/2 < i[0] < (180 + ignore)/2:
-                print(i)
-                del angles[c]
+            for c in range(len(angles) - 1, -1, -1):
+                i = angles[c]
+                if (180 - ignore)/2 < i[0] < (180 + ignore)/2:
+                    print(i)
+                    del angles[c]
 
-        amps = [0] * 6
-        inc = (360 - ignore) / 5
+            amps = [0] * 6
+            inc = (360 - ignore) / 5
 
-        possible = [(180 + ignore)/2 + i * inc for i in range(5)]
-        possible.insert(0, (180 - ignore)/2)
+            possible = [(180 + ignore)/2 + i * inc for i in range(5)]
+            possible.insert(0, (180 - ignore)/2)
 
-        for angle, channel in angles:
-            ind = 0
-            for c, k in enumerate(possible):
-                if k - inc/2 <= angle <= k + inc/2:
-                    ind = c
-                    if amps[ind] != 0:
-                        if ind == 5:
-                            if amps[0] == 0:
-                                ind = 0
-                                break
-                            if amps[4] == 0:
-                                ind = 4
-                                break
+            for angle, channel in angles:
+                ind = 0
+                for c, k in enumerate(possible):
+                    if k - inc/2 <= angle <= k + inc/2:
+                        ind = c
+                        if amps[ind] != 0:
+                            if ind == 5:
+                                if amps[0] == 0:
+                                    ind = 0
+                                    break
+                                if amps[4] == 0:
+                                    ind = 4
+                                    break
+                            else:
+                                if amps[ind + 1] == 0:
+                                    ind += 1
+                                    break
+                                if amps[ind - 1] == 0:
+                                    ind -= 1
+                                    break
                         else:
-                            if amps[ind + 1] == 0:
-                                ind += 1
-                                break
-                            if amps[ind - 1] == 0:
-                                ind -= 1
-                                break
-                    else:
-                        break
-            amps[ind] = max(analysis[channel][0], 1)
+                            break
+                amps[ind] = max(analysis[channel][0], 1)
 
-        print(angles)
-        print(analysis)
-        print(amps)
-        print("\n\n")
+            print(angles)
+            print(analysis)
+            print(amps)
+            print("\n\n")
 
-        out = "<%s, %s, %s, %s, %s, %s>" % (amps[0], amps[1], amps[2], amps[3], amps[4], amps[5])
-        s.write(out.encode())
+            out = "<%s, %s, %s, %s, %s, %s>" % (amps[0], amps[1], amps[2], amps[3], amps[4], amps[5])
+            s.write(out.encode())
+        except:
+            pass
 
 if __name__ == "__main__": 
     t1 = threading.Thread(target=sep)

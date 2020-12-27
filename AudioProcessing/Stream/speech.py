@@ -78,6 +78,7 @@ class ResumableMicrophoneStream:
             while True:
                 if self.prevlen != len(fm):                
                     back = len(fm) - self.prevlen
+                    self.prevlen = len(fm)
 
                     fc = channelframes[self.channelnum]
                     channels = np.frombuffer(b''.join(fm[-back:]), dtype='int16')
@@ -87,7 +88,6 @@ class ResumableMicrophoneStream:
                     # print([len(i) for i in channelframes], len(fm), back)
 
                     self._fill_buffer(channels)
-                    self.prevlen = len(fm)
 
         t1 = threading.Thread(target=init) 
         t2 = threading.Thread(target=sound) 
