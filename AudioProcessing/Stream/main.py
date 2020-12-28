@@ -25,6 +25,7 @@ graphdata = b""
 sepdata = b""
 postdata = b""
 angles = []
+analysis = []
 
 def sep():
     while True:
@@ -291,12 +292,63 @@ def avgfreq(block):
 
 #print("%3s %6s \t %3s %6s \t %3s %6s \t %3s %6s" % (amplitude(f0[-1]), avgfreq(f0[-1]), amplitude(f1[-1]), avgfreq(f1[-1]), amplitude(f2[-1]), avgfreq(f2[-1]), amplitude(f3[-1]), avgfreq(f3[-1])), amp * "|")
 
+def getanalysis():
+
+    ip = '192.168.1.218'
+
+    while True:
+        try:
+            port = 10050
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.bind((ip, port))
+            break
+        except:
+            print("Couldn't bind to that port 10010")
+
+    def accept_connections():
+        s.listen(100)
+
+        print('Running on IP: '+ip)
+        print('Running on port: '+str(port))
+        
+        while True:
+            c, addr = s.accept()
+            connections.append(c)
+            threading.Thread(target=handle_client,args=(c,addr,)).start()
+        
+    def broadcast(sock, data):
+        for client in connections:
+            if client != s and client != sock:
+                try:
+                    client.send(data)
+                except:
+                    pass
+
+    def handle_client(c, addr):
+        global analysis
+        while True:
+            try:
+                data = c.recv(512)
+                if data != b'':
+                    analysis = eval(data.decode().split("]]")[0] + "]]")
+            except KeyboardInterrupt:
+                c.close()
+                break
+            except:
+                pass
+
+    connections = []
+    accept_connections()
+    
 def arduino():
     global sepdata
     global angles
+    global analysis
+
     s = serial.Serial(port='/dev/tty.usbserial-14230', baudrate=115200)
 
     sound = db.reference('Sound')   
+
     while True:
         try:
             channels = np.frombuffer(sepdata, dtype='int16')
@@ -305,9 +357,8 @@ def arduino():
             c2 = channels[2::8].tobytes() #blue
             c3 = channels[3::8].tobytes() #purple
 
-            #analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
-            analysis = [[sound.child("sound%s" % (i)).child("amplitude").get(), sound.child("sound%s" % (i)).child("frequency").get()] for i in range(1, 5)]
-
+            # analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
+            # analysis = [[sound.child("sound%s" % (i)).child("amplitude").get(), sound.child("sound%s" % (i)).child("frequency").get()] for i in range(1, 5)]
             ignore = 120
 
             for c in range(len(angles) - 1, -1, -1):
@@ -353,7 +404,7 @@ def arduino():
 
             out = "<%s, %s, %s, %s, %s, %s>" % (amps[0], amps[1], amps[2], amps[3], amps[4], amps[5])
             s.write(out.encode())
-        except:
+        except Exception as e:
             pass
 
 if __name__ == "__main__": 
@@ -362,6 +413,7 @@ if __name__ == "__main__":
     t3 = threading.Thread(target=position) 
     t4 = threading.Thread(target=graph) 
     t5 = threading.Thread(target=arduino) 
+    t6 = threading.Thread(target=getanalysis) 
 
     try:
         t1.start() 
@@ -369,12 +421,14 @@ if __name__ == "__main__":
         t3.start() 
         t4.start() 
         t5.start() 
+        t6.start() 
 
         t1.join() 
         t2.join() 
         t3.join() 
         t4.join() 
         t5.join() 
+        t6.join() 
     except:
         print("\n\n\n\n\n\n\n\nEnd")
   
