@@ -1,26 +1,48 @@
-import speech_recognition as sr
+import socket  
+import threading
 
-'''
-Built-in Input
-Built-in Output
-DisplayPort
-SteelSeries Arctis 1 Wireless
-MMAudio Device
-MMAudio Device (UI Sounds)
-Soundflower (2ch)
-Soundflower (64ch)
-ZoomAudioDevice
-Quicktime Input
-Screen Record Audio
-'''
-r = sr.Recognizer()
-mic = sr.Microphone(device_index=3)
+ip = '192.168.1.218'
 
-with mic as source:
+while True:
+    try:
+        port = 10050
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind((ip, port))
+        break
+    except:
+        print("Couldn't bind to that port 10050")
+
+def accept_connections():
+    s.listen(100)
+
+    print('Running on IP: '+ip)
+    print('Running on port: '+str(port))
+    
     while True:
-        audio = r.listen(source)
-        print(audio)
+        c, addr = s.accept()
+        connections.append(c)
+        threading.Thread(target=handle_client,args=(c,addr,)).start()
+    
+def broadcast(sock, data):
+    for client in connections:
+        if client != s and client != sock:
+            try:
+                client.send(data)
+            except:
+                pass
+
+def handle_client(c, addr):
+    while True:
         try:
-            print(r.recognize_google(audio))
-        except:
-            pass
+            data = c.recv(8192)
+            if data != b'':
+                analysis = eval(data.decode().split("]]")[0] + "]]")
+                print(analysis)
+        except socket.error:
+            c.close()
+        except KeyboardInterrupt:
+            c.close()
+            break
+
+connections = []
+accept_connections()

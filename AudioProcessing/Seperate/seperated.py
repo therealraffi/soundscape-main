@@ -85,17 +85,17 @@ with socket.socket() as server_socket:
         try:
             data = conn.recv(8192)
 
-            channels = np.fromstring(data, dtype='int16')
+            channels = np.frombuffer(data, dtype='int16')
             c0 = channels[0::8] #red
             c1 = channels[1::8] #green
             c2 = channels[2::8] #blue
             c3 = channels[3::8] #purple
 
             fm.append(data)
-            f0.append(c0.tostring())
-            f1.append(c1.tostring())
-            f2.append(c2.tostring())
-            f3.append(c3.tostring())
+            f0.append(c0.tobytes())
+            f1.append(c1.tobytes())
+            f2.append(c2.tobytes())
+            f3.append(c3.tobytes())
 
             print(amplitude(f0[-1]), avgfreq(f0[-1]), "\t", amplitude(f1[-1]), avgfreq(f1[-1]), "\t", amplitude(f2[-1]), avgfreq(f2[-1]), "\t", amplitude(f3[-1]), avgfreq(f3[-1]))
         except (socket.error, KeyboardInterrupt) as e:
