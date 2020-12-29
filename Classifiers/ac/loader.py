@@ -1,4 +1,3 @@
-
 import torch
 import torchvision
 import torch.nn as nn
@@ -18,6 +17,22 @@ import librosa
 from tqdm import tqdm
 from tensorboardX import SummaryWriter
 from PIL import Image
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+import socket
+import threading
+from threading import Lock
+import pyaudio
+import wave
+
+# Fetch the service account key JSON file contents
+cred = credentials.Certificate('../fire.json')
+
+# Initialize the app with a service account, granting admin privileges
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://soundy-8d98a-default-rtdb.firebaseio.com/'
+})
 
 
 def evaluate(model, device, test_loader, classes):
@@ -55,19 +70,23 @@ def test(model, device, classes, params):
 	print(evaluate(model, device, val_loader, classes))
 	#print(evaluate(model, device, train_loader, classes))
 
-def predict(model, device, classes, filename):
-	inputs = process(filename).to(device)
+def predict(model, device, classes, clip, sr):
+	inputs = process(clip, sr).to(device)
 	outputs = model(inputs)
 	_, predicted = torch.max(outputs.data, 1)
-	print('Predicted:', classes[predicted[0]])
+	pred = classes[predicted[0]].replace('\n', '')
 
-def process(filename):
+	ref = db.reference('x_and_y')
+	ref.child("sound1").child("classification").set(pred)
+
+	print('Predicted:', pred)
+
+def process(clip, sr):
 	num_channels = 3
 	window_sizes = [25, 50, 100]
 	hop_sizes = [10, 25, 50]
 	centre_sec = 2.5
 	specs = []
-	clip, sr = librosa.load(filename, sr=SAMPLE_RATE)
 
 	for i in range(num_channels):
 		window_length = int(round(window_sizes[i]*SAMPLE_RATE/1000))
@@ -87,28 +106,118 @@ def process(filename):
 
 	return values
 
-if __name__ == "__main__":
-	CONFIG_PATH = 'config/esc_densenet.json'
-	CLASS_PATH = '../ESC-classes.txt'
-	WEIGHT_PATH = 'checks/model_best_1.pth.tar'
-	SAMPLE_RATE = 44100
-	GPU = "0"
+def save(name, channels, rate, frames):
+	wf = wave.open(name, 'wb')
+	wf.setnchannels(channels)
+	wf.setsampwidth(2)
+	wf.setframerate(rate)
+	wf.writeframes(b''.join(frames))
+	wf.close()
 
-	print("Preprocessing...")
+def receive_server_data():
+	while True:
+		try:
+			data = s.recv(8192)
+		except:
+			pass
 
-	params = utils.Params(CONFIG_PATH)
+def live_classification(model, device, classes):
+	while(len(queue) > 0):
+		data = np.frombuffer(queue.pop(0), dtype=np.float32)
+		np.hstack(data)
+		predict(model, device, classes, data, SAMPLE_RATE)
 
-	device = torch.device("cuda:"+GPU if torch.cuda.is_available() else "cpu")
+def live():
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-	model = models.densenet.DenseNet(params.dataset_name, params.pretrained).to(device)
-	model.load_state_dict(torch.load(WEIGHT_PATH)['model'])
-	model.eval()
+	while True:
+		target_ip = "98.169.167.38"
+		target_port = 5500
+		s.connect((target_ip, target_port))
+		break
 
-	classes=[]
-	for c in open(CLASS_PATH, 'r'):
-		classes.append(c)
+	chunk_size = 8192 # 512
+	audio_format = pyaudio.paFloat32
+	channels = 1
+	RATE = 44100
+	cRATE = 22050
 
-	filename = "baby_cry.wav"
-	#test(model, device, classes, params)
-	print('Classification')
-	predict(model, device, classes, filename)
+	print("Connected to Server")
+
+	fm, f0, f1, f2, f3 = [], [], [], [], []
+
+	data = s.recv(65536)
+	print(data)
+	queue.append(data)
+	threading.Thread(target=live_classification,args=(model,device,classes)).start()
+
+	while True:
+		try:
+			data = s.recv(40960)
+			queue.append(data)
+			threading.Thread(target=live_classification,args=(model,device,classes)).start()
+			channels = np.frombuffer(data, dtype='float32')
+                	# c0 = channels[0::8] #red
+                	# c1 = channels[1::8] #green
+                	# c2 = channels[2::8] #blue
+                	# c3 = channels[3::8] #purple
+
+			fm.append(data)
+                	# f0.append(c0.tobytes())
+                	# f1.append(c1.tobytes())
+                	# f2.append(c2.tobytes())
+        	        # f3.append(c3.tobytes())
+
+	                # f3[-1]
+
+		except KeyboardInterrupt as e:
+			print("Client Disconnected")
+			done = True
+			save("combined.wav", 1, RATE, fm)
+
+		        # save("channel0.wav", 1, cRATE, f0)
+			# save("channel1.wav", 1, cRATE, f1)
+			# save("channel2.wav", 1, cRATE, f2)
+			# save("channel3.wav", 1, cRATE, f3)
+
+			print("Done Saving")
+			break
+
+def sprint(*a, **b):
+    """Thread safe print function"""
+    with lock:
+        print(*a, **b)
+
+
+CONFIG_PATH = 'config/esc_densenet.json'
+CLASS_PATH = '../ESC-classes.txt'
+WEIGHT_PATH = 'checks/model_best_1.pth.tar'
+SAMPLE_RATE = 44100
+filename = "baby_cry.wav"
+GPU = "1"
+global queue
+global done
+done = False
+queue = []
+lock = Lock()
+
+print("Preprocessing...")
+
+params = utils.Params(CONFIG_PATH)
+
+device = torch.device("cuda:"+GPU if torch.cuda.is_available() else "cpu")
+
+model = models.densenet.DenseNet(params.dataset_name, params.pretrained).to(device)
+model.load_state_dict(torch.load(WEIGHT_PATH)['model'])
+model.eval()
+
+classes=[]
+for c in open(CLASS_PATH, 'r'):
+	classes.append(c)
+
+#test(model, device, classes, params)
+
+clip, sr = librosa.load(filename)
+#predict(model, device, classes, clip, SAMPLE_RATE)
+
+live()

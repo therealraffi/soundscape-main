@@ -1,40 +1,12 @@
 {
-  "project_info": {
-    "project_number": "964091785527",
-    "firebase_url": "https://soundy-8d98a-default-rtdb.firebaseio.com",
-    "project_id": "soundy-8d98a",
-    "storage_bucket": "soundy-8d98a.appspot.com"
-  },
-  "client": [
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:964091785527:android:140fd291ed283d7aea6ab2",
-        "android_client_info": {
-          "package_name": "com.example.soundy"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "964091785527-ppa3n8vu1edn079p04v8orusu6rjd62u.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBRtPW8EgYV7g6iymXaP3LNS58_QuQdyYA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "964091785527-ppa3n8vu1edn079p04v8orusu6rjd62u.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    }
-  ],
-  "configuration_version": "1"
+  "type": "service_account",
+  "project_id": "soundy-8d98a",
+  "private_key_id": "640da148c8390568db8103fb4494e83ea4e5ad93",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCogDUiXpOJnV3e\nRMR9b7jIb8rcHJ4Bp3zb2ZvddSRaUlZhdnakgkeVT4ur+0nwjR0J8R48H1WA1g3C\n+Oj9ha5WSczg96+2LDvO+zBreQ+DI27xZgIPPboVcLtfwlqTmr9si8mFUvYSLbHR\npae/HmU0npCJwZhkgvEKA7Ccm/YA3+I/ljd/Zib+X5TiM7Maaj0Ue9MtLvclHQFU\nRvy6WBlE/78Z1xKzvO+bUPeXC0c0PgTA61AjNQP6bbA9DAZxuOascFzHkgmIZwem\nhYLT9KGux+ROwe3CL922jUpVVm+ZkA8qE/OHERX7N5mUljpH/QZP/M4jiCf6ro5r\noYrpgsZLAgMBAAECggEANKmBMcEyRj+/HyEJ8hQxQb+ivKFbBrRUcxezPYcHeg0i\nvyo5kVfATJuEURdj+AD6cul/ZBX88Ju1yFpn4xhdMM228RaoPXzcomdiLiyzWu5/\nlYWmniHSHzJQ9XA2Q8yJCEE2FeukSXErkpS99R7oTYZDMTKm0L8V22Xk1EVwILxW\nPPGh6JV3DDQG26Z/xFKkOCIL/z7cIc36DlDJhPbg/UZsHnU90L3Nm5yKMUzkuqOb\noA8U7N5PTEQPLHiaYueuGwasbIL7Pjk75yRdcHJO/hddBMWVT5fhzzx3T4PC9uU1\n3tmVR23hKPZZKjjqN/ib8ApCWCKIH37KkwMWwykLDQKBgQDXo6IDr3ObEpf8chF2\nlGj2z64wzXus4Ex1GnGOtbc56Na+gV/zcifzjNVnTaCPAxZQAi5BehHNyQqdFfqw\nVWDjKqhdlzcp9qQ7ruVmo39BXwlsf1Ww+Orq+fKVGv1OljSJ/1OL1GmaycwWFzyf\nmqsFtvxI9ZzAHLeTOgvaW60shQKBgQDICe+UbdYEZEbKqswPey60tt+eMhhfgGy8\nl2MCHzH3xhrGLd+zHQQl3XMF+wzkoUMf16hqjmzk9UicLEnjMxvjwIOLFpcueD1E\niQ3of3odKJAnTk5Yp9VgImg+p7cUiz620QHCCv3QNatar//EEsqVHxVM5mrWQm23\nQryhqLPIjwKBgER2UC7JWnPGcHiWopK6RaTuhMg7xOM7Bys6rQj5CmYZVWyAWL1K\n5gI+GVbF347oFQJr3tGs9tAV3wfGfaPUR4F3/qJQKxRomPXV7kEq8XEIwk4vEz6v\nmK3nkyvhuMBlkeKqLJU9aBXbsa7ly7qEeX3D/c8QI6cetu3IRREbgBydAoGAMSOX\nscuFblC/vxtTw13MLGJb7j16FUOz8mPx01ycZrRIcXRlZldzZGXQ0qBIG4Wtuo28\ndmiEQX4rlwmeIOy2Ji1tYuZqvuSUkFhmjT17XtxPBQjMYCTiWpo5J2MFq0tFXZ1c\nJDGVBeeZL07asmy3TQh0sA5OIlHxJ7qCIegSOesCgYAxmTyJIjuZUIJIqvsYlBTv\nytlQ+cdpztOUldWeH2rnmExCjclKMyXsI+WqsuLl5IEgsRQ4UVLmUohG7b9HkW2t\nZd0X+Nwzb20EBr98Hux3s1Veuc6apgkIgoAUp3kzTO1adKsGFQwqP8QDoIoBGVUc\nHSLGrP9cDsavAxgEoGGbuw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-o03jf@soundy-8d98a.iam.gserviceaccount.com",
+  "client_id": "114170858530741218880",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-o03jf%40soundy-8d98a.iam.gserviceaccount.com"
 }
