@@ -8,16 +8,15 @@ ip = socket.gethostbyname(socket.gethostname())
 
 mic = pyaudio.PyAudio()
 
-FORMAT = pyaudio.paFloat32
+FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
-CHUNK = 8192
+CHUNK = 8192*4
 RECORD_SECONDS = 1.5
 stream = mic.open(format=FORMAT, channels=CHANNELS, rate=RATE,
                   input_device_index=2,
                   input=True, frames_per_buffer=CHUNK)
 
-global fm
 fm = []
 
 while True:
@@ -59,20 +58,21 @@ def broadcast(sock, data):
                 client.send(data)
             except:
                 pass
-
 def handle_client(c, addr):
     print("Start")
+    global fm
     while True:
         try:
-            frames = np.array([])
-            data = 0
-            for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-                data = stream.read(CHUNK, exception_on_overflow=False)
-                frames = np.append(frames, np.fromstring(data, dtype=np.float32))
-            print(len(frames))
-            # data = stream.read(CHUNK, exception_on_overflow=False)
+            # frames = np.array([])
+            # data = 0
+            # for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+            #     data = stream.read(CHUNK, exception_on_overflow=False)
+            #     frames = np.append(frames, np.fromstring(data, dtype=np.float32))
+            # print(len(frames))
+            data = stream.read(CHUNK, exception_on_overflow=False)
+            print(len(data))
             fm.append(data)
-            broadcast(c, frames.tobytes())
+            broadcast(c, data)
 
         except socket.error:
             save("server-combined.wav", 1, RATE, fm)
