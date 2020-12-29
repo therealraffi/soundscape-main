@@ -3,6 +3,7 @@ venv/*
 env/*
 py16/*
 py37/*
+envp/*
 
 **/ESC50
 Classifiers/ESC50/
