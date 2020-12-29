@@ -123,7 +123,7 @@ def receive_server_data():
 
 def live_classification(model, device, classes):
 	while(len(queue) > 0):
-		data = np.frombuffer(queue.pop(0), dtype=np.float32)
+		data = np.frombuffer(queue.pop(0), dtype=np.int16).astype('float32')
 		np.hstack(data)
 		predict(model, device, classes, data, SAMPLE_RATE)
 
@@ -136,8 +136,8 @@ def live():
 		s.connect((target_ip, target_port))
 		break
 
-	chunk_size = 8192 # 512
-	audio_format = pyaudio.paFloat32
+	chunk_size = 65536 # 512
+	audio_format = pyaudio.paInt16
 	channels = 1
 	RATE = 44100
 	cRATE = 22050
@@ -146,14 +146,14 @@ def live():
 
 	fm, f0, f1, f2, f3 = [], [], [], [], []
 
-	data = s.recv(65536)
+	data = s.recv(chunk_size)
 	print(data)
 	queue.append(data)
 	threading.Thread(target=live_classification,args=(model,device,classes)).start()
 
 	while True:
 		try:
-			data = s.recv(40960)
+			data = s.recv(chunk_size)
 			queue.append(data)
 			threading.Thread(target=live_classification,args=(model,device,classes)).start()
 			channels = np.frombuffer(data, dtype='float32')
@@ -221,3 +221,4 @@ clip, sr = librosa.load(filename)
 #predict(model, device, classes, clip, SAMPLE_RATE)
 
 live()
+
