@@ -3,6 +3,7 @@ import threading
 import pyaudio
 import wave
 import numpy as np
+import struct
 
 ip = socket.gethostbyname(socket.gethostname())
 
@@ -11,10 +12,11 @@ mic = pyaudio.PyAudio()
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
-CHUNK = 8192*4
+CHUNK = 1448//2
 RECORD_SECONDS = 1.5
+
 stream = mic.open(format=FORMAT, channels=CHANNELS, rate=RATE,
-                  input_device_index=2,
+                  input_device_index=1,
                   input=True, frames_per_buffer=CHUNK)
 
 fm = []
@@ -69,16 +71,28 @@ def handle_client(c, addr):
             #     data = stream.read(CHUNK, exception_on_overflow=False)
             #     frames = np.append(frames, np.fromstring(data, dtype=np.float32))
             # print(len(frames))
+
+            # scalar = np.full(1, 128)
             data = stream.read(CHUNK, exception_on_overflow=False)
+            # d = np.array(struct.unpack(str(2*CHUNK) + 'B', data), dtype='b')[::2]
+            # da = np.add(d, scalar)
+
             print(len(data))
             fm.append(data)
             broadcast(c, data)
 
-        except socket.error:
+        except KeyboardInterrupt:
+            print(e)
             save("server-combined.wav", 1, RATE, fm)
             print('Saved')
             c.close()
+            exit()            
+
+        except Exception as e:
+            print(e)
+            c.close()
             exit()
+            
 
 connections = []
 accept_connections()
