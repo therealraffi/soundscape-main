@@ -58,9 +58,12 @@ def sep():
         print('Running on port: '+ str(port))
         
         while True:
-            c, addr = s.accept()
-            connections.append(c)
-            threading.Thread(target=handle_client,args=(c,addr,)).start()
+            try:
+                c, addr = s.accept()
+                connections.append(c)
+                threading.Thread(target=handle_client,args=(c,addr,)).start()
+            except KeyboardInterrupt:
+                c.close()
         
     def broadcast(sock, data):
         for client in connections:
@@ -100,9 +103,12 @@ def post():
         print('Running on port: '+str(port))
         
         while True:
-            c, addr = s.accept()
-            connections.append(c)
-            threading.Thread(target=handle_client,args=(c,addr,)).start()
+            try:
+                c, addr = s.accept()
+                connections.append(c)
+                threading.Thread(target=handle_client,args=(c,addr,)).start()
+            except KeyboardInterrupt:
+                c.close()
         
     def broadcast(sock, data):
         for client in connections:
@@ -171,7 +177,6 @@ def position():
             target_ip = "173.66.155.183"
             target_port = 9000
             s.connect((target_ip, target_port))
-
             break
         except:
             print("Couldn't connect to server 9000")
@@ -293,19 +298,18 @@ def avgfreq(block):
         wsum = sum(freqdict.values())
         wsum = wsum if wsum != 0 else 1
 
-        # print()
-        # for i in freqdict:
-        #     print(int(i), "\t", freqdict[i] * 100 / wsum)
-        # print()
+        print()
+        for i in freqdict:
+            print(int(i), "\t", freqdict[i] * 100 / wsum)
+        print()
 
         out = 0
         for i in freqdict:
             out += i * freqdict[i] / wsum
 
-        return None if math.isnan(float(out)) or len(freqdict) == 0 else max(1, int(out))
+        return None if math.isnan(float(out)) or len(freqdict) == 0 else max(1, int(out/2))
 
 def getanalysis():
-
     ip = '192.168.1.218'
 
     while True:
@@ -324,9 +328,12 @@ def getanalysis():
         print('Running on port: '+str(port))
         
         while True:
-            c, addr = s.accept()
-            connections.append(c)
-            threading.Thread(target=handle_client,args=(c,addr,)).start()
+            try:
+                c, addr = s.accept()
+                connections.append(c)
+                threading.Thread(target=handle_client,args=(c,addr,)).start()
+            except KeyboardInterrupt:
+                c.close()
         
     def broadcast(sock, data):
         for client in connections:
@@ -371,8 +378,7 @@ def arduino():
             c2 = channels[2::8].tobytes() #blue
             c3 = channels[3::8].tobytes() #purple
 
-            analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
-            # analysis = [[sound.child("sound%s" % (i)).child("amplitude").get(), sound.child("sound%s" % (i)).child("frequency").get()] for i in range(1, 5)]
+            # analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
             ignore = 120
 
             for c in range(len(angles) - 1, -1, -1):
