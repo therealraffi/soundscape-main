@@ -25,6 +25,7 @@ import threading
 from threading import Lock
 import pyaudio
 import wave
+import struct
 
 # Fetch the service account key JSON file contents
 cred = credentials.Certificate('../fire.json')
@@ -93,7 +94,11 @@ def process(clip, sr):
 		hop_length = int(round(hop_sizes[i]*SAMPLE_RATE/1000))
 
 		clip = torch.Tensor(clip)
+		#print(clip[:50])
+		#sprint(clip)
+		#sprint(clip.shape)
 		spec = torchaudio.transforms.MelSpectrogram(SAMPLE_RATE, n_fft=4410, win_length=window_length, hop_length=hop_length, n_mels=128)(clip)
+		#print(spec.shape)
 		eps = 1e-6
 		spec = spec.numpy()
 		spec = np.log(spec+ eps)
@@ -121,11 +126,28 @@ def receive_server_data():
 		except:
 			pass
 
-def live_classification(model, device, classes):
-	while(len(queue) > 0):
-		data = np.frombuffer(queue.pop(0), dtype=np.int16).astype('float32')
-		np.hstack(data)
-		predict(model, device, classes, data, SAMPLE_RATE)
+def live_classification(model, device, classes, chunk, n):
+	while(len(queue) > n):
+		data = np.array([])
+		for i in range(n):
+			data = np.concatenate([data, np.frombuffer(queue.pop(0), dtype=np.int16)])
+		#data = np.frombuffer(queue.pop(0), dtype=np.int16)
+		#d = queue.pop(0)
+
+		#print(len(d))
+		#data = np.array(struct.unpack(str(chunk) + 'B', d), dtype='b')
+		#scalar = np.full(1, 128)
+
+		#da = np.add(data, scalar)
+		#np.hstack(da)
+
+		#de = da.astype('float32')
+		#print(de)
+
+		#print(data)
+		mono = data / 32768
+		#print(mono)
+		predict(model, device, classes, mono, SAMPLE_RATE)
 
 def live():
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -136,7 +158,7 @@ def live():
 		s.connect((target_ip, target_port))
 		break
 
-	chunk_size = 65536 # 512
+	CHUNK = 1448 # 512
 	audio_format = pyaudio.paInt16
 	channels = 1
 	RATE = 44100
@@ -146,18 +168,21 @@ def live():
 
 	fm, f0, f1, f2, f3 = [], [], [], [], []
 
-	data = s.recv(chunk_size)
-	print(data)
+	data = s.recv(CHUNK)
 	queue.append(data)
-	threading.Thread(target=live_classification,args=(model,device,classes)).start()
+	threading.Thread(target=live_classification,args=(model,device,classes, CHUNK)).start()
 
+	n = 10
 	while True:
 		try:
-			data = s.recv(chunk_size)
+			data = s.recv(CHUNK)
+			if not data: break
+			if len(data) != CHUNK: sprint(len(data))
 			queue.append(data)
-			threading.Thread(target=live_classification,args=(model,device,classes)).start()
+			if(len(queue) > 10):
+				threading.Thread(target=live_classification,args=(model,device,classes, CHUNK, n)).start()
 			channels = np.frombuffer(data, dtype='float32')
-                	# c0 = channels[0::8] #red
+			# c0 = channels[0::8] #red
                 	# c1 = channels[1::8] #green
                 	# c2 = channels[2::8] #blue
                 	# c3 = channels[3::8] #purple
@@ -182,6 +207,7 @@ def live():
 
 			print("Done Saving")
 			break
+	save("combined.wav", 1, RATE, fm)
 
 def sprint(*a, **b):
     """Thread safe print function"""
@@ -193,8 +219,8 @@ CONFIG_PATH = 'config/esc_densenet.json'
 CLASS_PATH = '../ESC-classes.txt'
 WEIGHT_PATH = 'checks/model_best_1.pth.tar'
 SAMPLE_RATE = 44100
-filename = "baby_cry.wav"
-GPU = "1"
+filename = "combined.wav"
+GPU = "0"
 global queue
 global done
 done = False
@@ -202,6 +228,9 @@ queue = []
 lock = Lock()
 
 print("Preprocessing...")
+
+clip, sr = librosa.load(filename)
+#print(clip * 32768)
 
 params = utils.Params(CONFIG_PATH)
 
@@ -217,8 +246,7 @@ for c in open(CLASS_PATH, 'r'):
 
 #test(model, device, classes, params)
 
-clip, sr = librosa.load(filename)
-#predict(model, device, classes, clip, SAMPLE_RATE)
+predict(model, device, classes, clip, SAMPLE_RATE)
 
-live()
+#live()
 
