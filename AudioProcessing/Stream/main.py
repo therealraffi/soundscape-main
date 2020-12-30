@@ -298,10 +298,10 @@ def avgfreq(block):
         wsum = sum(freqdict.values())
         wsum = wsum if wsum != 0 else 1
 
-        print()
-        for i in freqdict:
-            print(int(i), "\t", freqdict[i] * 100 / wsum)
-        print()
+        # print()
+        # for i in freqdict:
+        #     print(int(i), "\t", freqdict[i] * 100 / wsum)
+        # print()
 
         out = 0
         for i in freqdict:
@@ -372,13 +372,13 @@ def arduino():
 
     while True:
         try:
-            channels = np.frombuffer(sepdata, dtype='int16')
+            channels = np.frombuffer(postdata, dtype='int16')
             c0 = channels[0::8].tobytes() #red
             c1 = channels[1::8].tobytes() #green
             c2 = channels[2::8].tobytes() #blue
             c3 = channels[3::8].tobytes() #purple
 
-            # analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
+            analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
             ignore = 120
 
             for c in range(len(angles) - 1, -1, -1):
@@ -421,7 +421,7 @@ def arduino():
             # print(motors)
             # print("\n\n")
 
-            print("%3s %6s \t %3s %6s \t %3s %6s \t %3s %6s" % (analysis[0][0], analysis[0][1], analysis[1][0], analysis[1][1], analysis[2][0], analysis[2][0], analysis[3][0], analysis[3][1]), amplitude(sepdata) * "|")
+            print("%3s %6s \t %3s %6s \t %3s %6s \t %3s %6s" % (analysis[0][0], analysis[0][1], analysis[1][0], analysis[1][1], analysis[2][0], analysis[2][1], analysis[3][0], analysis[3][1]), amplitude(postdata) * "|")
 
             low = [0] * 6
             high = [0] * 6
