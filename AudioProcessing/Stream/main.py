@@ -141,15 +141,6 @@ def graph():
     global graphdata
     global angles
 
-    # plt.axis([-1.1, 1.1, -1.1, 1.1])
-    # ax = plt.gca()
-    # ax.spines['top'].set_color('none')
-    # ax.spines['bottom'].set_position('zero')
-    # ax.spines['left'].set_position('zero')
-    # ax.spines['right'].set_color('none')
-    # ax.add_artist(plt.Circle((0, 0), 1, color='k', fill=False))
-    # ax.set_aspect("equal")
-
     coord = db.reference('x_and_y')   
     while True:
         try:
@@ -190,17 +181,11 @@ def graph():
             #Firebase
             fire = eval(firejson(plot, ind))
             coord.set(fire)
-
-            # plot = np.array(plot)
-            # points = plt.scatter(plot[:, 0], plot[:, 1], c=ind, s = 50)
-            # plt.pause(0.000001)
-            # points.remove()
-
         except KeyboardInterrupt as e:
             pass
         except Exception as e:
             pass
-            
+
 def sig(num):
     return 1/(1 + math.exp(-20 * num))
 
