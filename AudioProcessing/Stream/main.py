@@ -56,7 +56,6 @@ def sep():
     while True:
         try:
             sepdata = s.recv(8192)
-            print(len(sepdata))
         except Exception as e:
             print(e)
             pass
@@ -279,7 +278,7 @@ def getanalysis():
     while True:
         try:
             target_ip = "35.186.188.127"
-            target_port = 10010
+            target_port = 10050
             s.connect((target_ip, target_port))
             break
         except:
@@ -311,7 +310,7 @@ def arduino():
             c2 = channels[2::8].tobytes() #blue
             c3 = channels[3::8].tobytes() #purple
 
-            analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
+            # analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
             ignore = 120
 
             for c in range(len(angles) - 1, -1, -1):
@@ -567,7 +566,7 @@ if __name__ == "__main__":
     t3 = threading.Thread(target=position) 
     t4 = threading.Thread(target=graph) 
     t5 = threading.Thread(target=arduino) 
-    # t6 = threading.Thread(target=getanalysis) 
+    t6 = threading.Thread(target=getanalysis) 
 
     # s1 = threading.Thread(target=main, kwargs={'channelnum': 0})
     # s2 = threading.Thread(target=main, kwargs={'channelnum': 1})
@@ -580,7 +579,7 @@ if __name__ == "__main__":
         t3.start() 
         t4.start() 
         t5.start() 
-        # t6.start() 
+        t6.start() 
 
         # s1.start() 
         # s2.start() 
@@ -592,7 +591,7 @@ if __name__ == "__main__":
         t3.join() 
         t4.join() 
         t5.join() 
-        # t6.join() 
+        t6.join() 
 
         # s1.join() 
         # s2.join() 
