@@ -14,6 +14,7 @@ from google.cloud import speech
 from six.moves import queue
 import time
 import sys
+import matplotlib.pyplot as plt
 
 #Local IP
 ip = socket.gethostbyname(socket.gethostname())
@@ -41,140 +42,50 @@ SAMPLE_RATE = 44100//2
 CHUNK_SIZE = 8192  # 100ms
 
 def sep():
+    global sepdata
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
-            port = 10000
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.bind((ip, port))
-            break
-        except Exception as e:
-            # print(e)
-            print("Couldn't bind to that port 10000")
-
-    def accept_connections():
-        s.listen(100)
-
-        print('Running on IP: ' + ip)
-        print('Running on port: '+ str(port))
-        
-        while True:
-            try:
-                c, addr = s.accept()
-                connections.append(c)
-                threading.Thread(target=handle_client,args=(c,addr,)).start()
-            except KeyboardInterrupt:
-                c.close()
-        
-    def broadcast(sock, data):
-        for client in connections:
-            if client != s and client != sock:
-                try:
-                    client.send(data)
-                except:
-                    pass
-
-    def handle_client(c, addr):
-        global sepdata
-        while True:
-            try:
-                sepdata = c.recv(8192)
-                broadcast(c, sepdata)
-                fm.append(sepdata)
-            except socket.error:
-                c.close()
-
-    connections = []
-    accept_connections()
-
-def post():
-    while True:
-        try:
-            port = 10010
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.bind((ip, port))
+            target_ip = "35.186.188.127"
+            target_port = 10000
+            s.connect((target_ip, target_port))
             break
         except:
-            print("Couldn't bind to that port 10010")
+            print("Couldn't connect to server 9000")
 
-    def accept_connections():
-        s.listen(100)
+    while True:
+        try:
+            sepdata = s.recv(8192)
+            print(len(sepdata))
+        except Exception as e:
+            print(e)
+            pass
 
-        print('Running on IP: '+ip)
-        print('Running on port: '+str(port))
-        
-        while True:
-            try:
-                c, addr = s.accept()
-                connections.append(c)
-                threading.Thread(target=handle_client,args=(c,addr,)).start()
-            except KeyboardInterrupt:
-                c.close()
-        
-    def broadcast(sock, data):
-        for client in connections:
-            if client != s and client != sock:
-                try:
-                    client.send(data)
-                except:
-                    pass
+def post():
+    global postdata
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    while True:
+        try:
+            target_ip = "35.186.188.127"
+            target_port = 10010
+            s.connect((target_ip, target_port))
+            break
+        except:
+            print("Couldn't connect to server 9000")
 
-    def handle_client(c, addr):
-        global postdata
-        while True:
-            try:
-                postdata = c.recv(8192)
-                broadcast(c, postdata)
-            except socket.error:
-                c.close()
-
-    connections = []
-    accept_connections()
+    while True:
+        try:
+            postdata = s.recv(8192)
+        except Exception as e:
+            print(e)
+            pass
 
 def position():
-    # while True:
-    #     try:
-    #         port = 9000
-    #         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #         s.bind((ip, port))
-    #         break
-    #     except:
-    #         print("Couldn't bind to that port")
-
-    # def accept_connections():
-    #     s.listen(100)
-
-    #     print('Running on IP: ' + ip)
-    #     print('Running on port: '+ str(port))
-        
-    #     while True:
-    #         c, addr = s.accept()
-    #         connections.append(c)
-    #         threading.Thread(target=handle_client,args=(c,addr,)).start()
-        
-    # def broadcast(sock, data):
-    #     for client in connections:
-    #         if client != s and client != sock:
-    #             try:
-    #                 client.send(data)
-    #             except:
-    #                 pass
-
-    # def handle_client(c, addr):
-    #     global graphdata
-    #     while True:
-    #         try:
-    #             graphdata = c.recv(8192)
-    #             broadcast(c, graphdata)
-    #         except socket.error:
-    #             c.close()
-
-    # connections = []
-    # accept_connections()
     global graphdata
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
-            target_ip = "173.66.155.183"
+            target_ip = "35.186.188.127"
             target_port = 9000
             s.connect((target_ip, target_port))
             break
@@ -182,7 +93,11 @@ def position():
             print("Couldn't connect to server 9000")
 
     while True:
-        graphdata = s.recv(8192)
+        try:
+            graphdata = s.recv(8192)
+        except Exception as e:
+            print(e)
+            pass
 
 def firejson(plot, colors):
     visible = ['false'] * 4
@@ -310,55 +225,75 @@ def avgfreq(block):
         return None if math.isnan(float(out)) or len(freqdict) == 0 else max(1, int(out/2))
 
 def getanalysis():
-    ip = '192.168.1.218'
+    # ip = '192.168.1.218'
+
+    # while True:
+    #     try:
+    #         port = 10050
+    #         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #         s.bind((ip, port))
+    #         break
+    #     except:
+    #         print("Couldn't bind to that port 10010")
+
+    # def accept_connections():
+    #     s.listen(100)
+
+    #     print('Running on IP: '+ip)
+    #     print('Running on port: '+str(port))
+        
+    #     while True:
+    #         try:
+    #             c, addr = s.accept()
+    #             connections.append(c)
+    #             threading.Thread(target=handle_client,args=(c,addr,)).start()
+    #         except KeyboardInterrupt:
+    #             c.close()
+        
+    # def broadcast(sock, data):
+    #     for client in connections:
+    #         if client != s and client != sock:
+    #             try:
+    #                 client.send(data)
+    #             except:
+    #                 pass
+
+    # def handle_client(c, addr):
+    #     global analysis
+    #     while True:
+    #         try:
+    #             data = c.recv(512)
+    #             if data != b'':
+    #                 analysis = eval(data.decode().split("]]")[0] + "]]")
+    #         except KeyboardInterrupt:
+    #             c.close()
+    #             break
+    #         except:
+    #             pass
+
+    # connections = []
+    # accept_connections()
+    
+    global analysis
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    while True:
+        try:
+            target_ip = "35.186.188.127"
+            target_port = 10010
+            s.connect((target_ip, target_port))
+            break
+        except:
+            print("Couldn't connect to server 9000")
 
     while True:
         try:
-            port = 10050
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.bind((ip, port))
-            break
-        except:
-            print("Couldn't bind to that port 10010")
+            data = s.recv(512)
+            if data != b'':
+                analysis = eval(data.decode().split("]]")[0] + "]]")
+        except Exception as e:
+            print(e)
+            pass
 
-    def accept_connections():
-        s.listen(100)
-
-        print('Running on IP: '+ip)
-        print('Running on port: '+str(port))
-        
-        while True:
-            try:
-                c, addr = s.accept()
-                connections.append(c)
-                threading.Thread(target=handle_client,args=(c,addr,)).start()
-            except KeyboardInterrupt:
-                c.close()
-        
-    def broadcast(sock, data):
-        for client in connections:
-            if client != s and client != sock:
-                try:
-                    client.send(data)
-                except:
-                    pass
-
-    def handle_client(c, addr):
-        global analysis
-        while True:
-            try:
-                data = c.recv(512)
-                if data != b'':
-                    analysis = eval(data.decode().split("]]")[0] + "]]")
-            except KeyboardInterrupt:
-                c.close()
-                break
-            except:
-                pass
-
-    connections = []
-    accept_connections()
-    
 def arduino():
     global sepdata
     global postdata
@@ -367,8 +302,6 @@ def arduino():
 
     ardhigh = serial.Serial(port='/dev/tty.usbmodem142301', baudrate=115200)
     ardlow = serial.Serial(port='/dev/tty.usbserial-141110', baudrate=115200)
-
-    sound = db.reference('Sound')   
 
     while True:
         try:
@@ -441,6 +374,7 @@ def arduino():
             ardhigh.write(out.encode())
             
         except Exception as e:
+            # print(e)
             pass
 
 #Speech
@@ -480,8 +414,6 @@ class ResumableMicrophoneStream:
                     channels = np.frombuffer(b''.join(fm[-back:]), dtype='int16')
                     channels = channels[self.channelnum::8].tobytes()
                     fc.append(channels)
-
-                    # print([len(i) for i in channelframes], len(fm), back)
 
                     self._fill_buffer(channels)
 
@@ -635,7 +567,7 @@ if __name__ == "__main__":
     t3 = threading.Thread(target=position) 
     t4 = threading.Thread(target=graph) 
     t5 = threading.Thread(target=arduino) 
-    t6 = threading.Thread(target=getanalysis) 
+    # t6 = threading.Thread(target=getanalysis) 
 
     # s1 = threading.Thread(target=main, kwargs={'channelnum': 0})
     # s2 = threading.Thread(target=main, kwargs={'channelnum': 1})
@@ -648,7 +580,7 @@ if __name__ == "__main__":
         t3.start() 
         t4.start() 
         t5.start() 
-        t6.start() 
+        # t6.start() 
 
         # s1.start() 
         # s2.start() 
@@ -660,7 +592,7 @@ if __name__ == "__main__":
         t3.join() 
         t4.join() 
         t5.join() 
-        t6.join() 
+        # t6.join() 
 
         # s1.join() 
         # s2.join() 
