@@ -98,6 +98,27 @@ def position():
             print(e)
             pass
 
+def getanalysis():
+    global analysis
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    while True:
+        try:
+            target_ip = "35.186.188.127"
+            target_port = 10050
+            s.connect((target_ip, target_port))
+            break
+        except:
+            print("Couldn't connect to server 10050")
+
+    while True:
+        try:
+            data = s.recv(512)
+            if data != b'':
+                analysis = eval("[[" + re.findall(r'\[\[(.*?)\]\]', data.decode())[0] + "]]")
+        except Exception as e:
+            # print(e)
+            pass
+
 def firejson(plot, colors):
     visible = ['false'] * 4
     for i in colors:
@@ -119,6 +140,15 @@ def firejson(plot, colors):
 def graph():
     global graphdata
     global angles
+
+    # plt.axis([-1.1, 1.1, -1.1, 1.1])
+    # ax = plt.gca()
+    # ax.spines['top'].set_color('none')
+    # ax.spines['bottom'].set_position('zero')
+    # ax.spines['left'].set_position('zero')
+    # ax.spines['right'].set_color('none')
+    # ax.add_artist(plt.Circle((0, 0), 1, color='k', fill=False))
+    # ax.set_aspect("equal")
 
     coord = db.reference('x_and_y')   
     while True:
@@ -153,13 +183,19 @@ def graph():
                     angle += 360
                 temp.append([angle, int(ind[i][1])])
                 angle *= math.pi/180
+
                 plot.append([math.cos(angle), math.sin(angle)])
-            
             angles = temp
 
             #Firebase
             fire = eval(firejson(plot, ind))
             coord.set(fire)
+
+            # plot = np.array(plot)
+            # points = plt.scatter(plot[:, 0], plot[:, 1], c=ind, s = 50)
+            # plt.pause(0.000001)
+            # points.remove()
+
         except KeyboardInterrupt as e:
             pass
         except Exception as e:
@@ -222,76 +258,6 @@ def avgfreq(block):
             out += i * freqdict[i] / wsum
 
         return None if math.isnan(float(out)) or len(freqdict) == 0 else max(1, int(out/2))
-
-def getanalysis():
-    # ip = '192.168.1.218'
-
-    # while True:
-    #     try:
-    #         port = 10050
-    #         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #         s.bind((ip, port))
-    #         break
-    #     except:
-    #         print("Couldn't bind to that port 10010")
-
-    # def accept_connections():
-    #     s.listen(100)
-
-    #     print('Running on IP: '+ip)
-    #     print('Running on port: '+str(port))
-        
-    #     while True:
-    #         try:
-    #             c, addr = s.accept()
-    #             connections.append(c)
-    #             threading.Thread(target=handle_client,args=(c,addr,)).start()
-    #         except KeyboardInterrupt:
-    #             c.close()
-        
-    # def broadcast(sock, data):
-    #     for client in connections:
-    #         if client != s and client != sock:
-    #             try:
-    #                 client.send(data)
-    #             except:
-    #                 pass
-
-    # def handle_client(c, addr):
-    #     global analysis
-    #     while True:
-    #         try:
-    #             data = c.recv(512)
-    #             if data != b'':
-    #                 analysis = eval(data.decode().split("]]")[0] + "]]")
-    #         except KeyboardInterrupt:
-    #             c.close()
-    #             break
-    #         except:
-    #             pass
-
-    # connections = []
-    # accept_connections()
-    
-    global analysis
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    while True:
-        try:
-            target_ip = "35.186.188.127"
-            target_port = 10050
-            s.connect((target_ip, target_port))
-            break
-        except:
-            print("Couldn't connect to server 9000")
-
-    while True:
-        try:
-            data = s.recv(512)
-            if data != b'':
-                analysis = eval(data.decode().split("]]")[0] + "]]")
-        except Exception as e:
-            print(e)
-            pass
 
 def arduino():
     global sepdata
