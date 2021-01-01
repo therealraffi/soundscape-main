@@ -141,11 +141,11 @@ def graph():
     global graphdata
     global angles
 
-    coord = db.reference('x_and_y')   
+    firecoord = db.reference('x_and_y')   
     while True:
         try:
             coord = graphdata.decode().replace("\n", "")
-            result = re.search(r'\[(.*?)]', coord).group(1)
+            result = re.search(r'\[(.*?)\]', coord).group(1)
             xc = re.findall(r'"x": (.*?),', result)
             yc = re.findall(r'"y": (.*?),', result)
             zc = re.findall(r'"z": (.*?),', result)
@@ -180,7 +180,7 @@ def graph():
 
             #Firebase
             fire = eval(firejson(plot, ind))
-            coord.set(fire)
+            firecoord.set(fire)
         except KeyboardInterrupt as e:
             pass
         except Exception as e:
@@ -512,42 +512,41 @@ def main(channelnum):
             return  
 
 if __name__ == "__main__": 
-    t1 = threading.Thread(target=sep)
-    t2 = threading.Thread(target=post) 
-    t3 = threading.Thread(target=position) 
-    t4 = threading.Thread(target=graph) 
-    t5 = threading.Thread(target=arduino) 
-    t6 = threading.Thread(target=getanalysis) 
+    t1 = threading.Thread(target=sep, daemon=True)
+    t2 = threading.Thread(target=post, daemon=True) 
+    t3 = threading.Thread(target=position, daemon=True) 
+    t4 = threading.Thread(target=graph, daemon=True) 
+    t5 = threading.Thread(target=arduino, daemon=True) 
+    t6 = threading.Thread(target=getanalysis, daemon=True) 
+
+    t1.start() 
+    t2.start() 
+    t3.start() 
+    t4.start() 
+    t5.start() 
+    t6.start() 
 
     # s1 = threading.Thread(target=main, kwargs={'channelnum': 0})
     # s2 = threading.Thread(target=main, kwargs={'channelnum': 1})
     # s3 = threading.Thread(target=main, kwargs={'channelnum': 2})
     # s4 = threading.Thread(target=main, kwargs={'channelnum': 3})
-
+    # s1.start() 
+    # s2.start() 
+    # s3.start() 
+    # s4.start() 
     try:
-        t1.start() 
-        t2.start() 
-        t3.start() 
-        t4.start() 
-        t5.start() 
-        t6.start() 
-
-        # s1.start() 
-        # s2.start() 
-        # s3.start() 
-        # s4.start() 
-
-        t1.join() 
-        t2.join() 
-        t3.join() 
-        t4.join() 
-        t5.join() 
-        t6.join() 
+        while True:
+            time.sleep(1)
 
         # s1.join() 
         # s2.join() 
         # s3.join() 
         # s4.join() 
     except:
+        t1.join() 
+        t2.join() 
+        t3.join() 
+        t4.join() 
+        t5.join() 
+        t6.join() 
         print("\n\n\n\n\n\n\n\nEnd")
-  
