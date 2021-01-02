@@ -36,7 +36,7 @@ finalspeech = ""
 
 while True:
     try:
-        target_ip = "173.66.155.183"
+        target_ip = "35.186.188.127"
         target_port = 10000
         s.connect((target_ip, target_port))
         break
@@ -257,28 +257,34 @@ def main(channelnum):
 
 if __name__ == "__main__": 
     t0 = threading.Thread(target=getsound)
-    t1 = threading.Thread(target=main, kwargs={'channelnum': 0})
-    t2 = threading.Thread(target=main, kwargs={'channelnum': 1})
-    t3 = threading.Thread(target=main, kwargs={'channelnum': 2})
-    t4 = threading.Thread(target=main, kwargs={'channelnum': 3})
+    t1 = threading.Thread(target=main, kwargs={'channelnum': 0}, daemon=True)
+    t2 = threading.Thread(target=main, kwargs={'channelnum': 1}, daemon=True)
+    t3 = threading.Thread(target=main, kwargs={'channelnum': 2}, daemon=True)
+    t4 = threading.Thread(target=main, kwargs={'channelnum': 3}, daemon=True)
+
+    t0.start()
+    t1.start() 
+    t2.start() 
+    t3.start() 
+    t4.start() 
 
     try:
-        t0.start()
-        t1.start() 
-        t2.start() 
-        t3.start() 
-        t4.start() 
-
         t0.join()
         t1.join() 
         t2.join() 
         t3.join() 
         t4.join() 
     except:
-        save("speech.wav", 4, 44100, fm)   
-        save("speechchannel0.wav", 1, 44100//2, channelframes[0])  
-        save("speechchannel1.wav", 1, 44100//2, channelframes[1]) 
-        save("speechchannel2.wav", 1, 44100//2, channelframes[2]) 
-        save("speechchannel3.wav", 1, 44100//2, channelframes[3])  
+        t0.join()
+        t1.join() 
+        t2.join() 
+        t3.join() 
+        t4.join() 
+
+        # save("speech.wav", 4, 44100, fm)   
+        # save("speechchannel0.wav", 1, 44100//2, channelframes[0])  
+        # save("speechchannel1.wav", 1, 44100//2, channelframes[1]) 
+        # save("speechchannel2.wav", 1, 44100//2, channelframes[2]) 
+        # save("speechchannel3.wav", 1, 44100//2, channelframes[3])  
 
         print("\n\nSaved\n\n\n\n\n\nEnd")
