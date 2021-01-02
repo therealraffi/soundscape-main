@@ -78,8 +78,8 @@ public class LoadingScreen extends AppCompatActivity {
 
         ObjectAnimator scaleDown = ObjectAnimator.ofPropertyValuesHolder(
                 filled,
-                PropertyValuesHolder.ofFloat("scaleX", 1.1f),
-                PropertyValuesHolder.ofFloat("scaleY", 1.1f));
+                PropertyValuesHolder.ofFloat("scaleX", 1.2f),
+                PropertyValuesHolder.ofFloat("scaleY", 1.2f));
         scaleDown.setDuration(1500);
 
         scaleDown.setRepeatCount(ObjectAnimator.INFINITE);
