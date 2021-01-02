@@ -50,8 +50,10 @@ public class LoadingScreen extends AppCompatActivity {
     TextView[] text ;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().setStatusBarColor(Color.parseColor("#f72585"));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading_screen);
         getSupportActionBar().hide();

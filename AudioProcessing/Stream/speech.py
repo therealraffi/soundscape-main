@@ -33,6 +33,8 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 fm = []
 channelframes = [[], [], [], []]
 finalspeech = ""
+prevspeech = ""
+running = True
 
 while True:
     try:
@@ -45,9 +47,11 @@ while True:
 
 def getsound():
     global fm
-    while True:
+    global running
+    while running:
         data = s.recv(8192)
         fm.append(data)
+    s.close()
 
 def get_current_time():
     return int(round(time.time() * 1000))
@@ -75,7 +79,8 @@ class ResumableMicrophoneStream:
 
         def sound():
             global fm
-            while True:
+            global running
+            while running:
                 if self.prevlen != len(fm):                
                     back = len(fm) - self.prevlen
                     self.prevlen = len(fm)
@@ -148,7 +153,8 @@ class ResumableMicrophoneStream:
             yield b"".join(data)
 
 def listen_print_loop(responses, stream, channelnum):
-    global finalspeech  
+    global finalspeech
+    global prevspeech  
     for response in responses:
         if get_current_time() - stream.start_time > STREAMING_LIMIT:
             stream.start_time = get_current_time()
@@ -262,29 +268,28 @@ if __name__ == "__main__":
     t3 = threading.Thread(target=main, kwargs={'channelnum': 2}, daemon=True)
     t4 = threading.Thread(target=main, kwargs={'channelnum': 3}, daemon=True)
 
-    t0.start()
-    t1.start() 
-    t2.start() 
-    t3.start() 
-    t4.start() 
+    try:
+        t0.start() 
+        t1.start() 
+        t2.start() 
+        t3.start() 
+        t4.start() 
+    except:
+        running = False
+        print("\n\n\n\n\n\n\n\nEnd Thread")
+        sys.exit()
 
     try:
-        t0.join()
-        t1.join() 
-        t2.join() 
-        t3.join() 
-        t4.join() 
+        while True:
+            time.sleep(1)
     except:
-        t0.join()
-        t1.join() 
-        t2.join() 
-        t3.join() 
-        t4.join() 
+        s.close()
+        running = False
+        print("\n\n\n\n\n\n\n\nEnd Final")
+        sys.exit()
 
         # save("speech.wav", 4, 44100, fm)   
         # save("speechchannel0.wav", 1, 44100//2, channelframes[0])  
         # save("speechchannel1.wav", 1, 44100//2, channelframes[1]) 
         # save("speechchannel2.wav", 1, 44100//2, channelframes[2]) 
         # save("speechchannel3.wav", 1, 44100//2, channelframes[3])  
-
-        print("\n\nSaved\n\n\n\n\n\nEnd")

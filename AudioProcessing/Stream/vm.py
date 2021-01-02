@@ -5,6 +5,7 @@ import re
 import math
 import struct
 import time
+import sys
 
 #Local IP
 ip = socket.gethostbyname(socket.gethostname())
@@ -76,9 +77,5 @@ if __name__ == "__main__":
         while True:
             time.sleep(1)
     except:
-        t1.join() 
-        t2.join() 
-        t3.join() 
-        t4.join() 
-        
         print("\n\n\n\n\n\n\n\nEnd")
+        sys.exit()
