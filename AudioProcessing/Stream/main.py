@@ -29,6 +29,7 @@ firebase_admin.initialize_app(cred, {
 graphdata = b""
 sepdata = b""
 postdata = b""
+running = True
 angles = []
 analysis = []
 fm = []
@@ -43,6 +44,7 @@ CHUNK_SIZE = 8192  # 100ms
 
 def sep():
     global sepdata
+    global running
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
@@ -53,15 +55,17 @@ def sep():
         except:
             print("Couldn't connect to server 9000")
 
-    while True:
+    while running:
         try:
             sepdata = s.recv(8192)
         except Exception as e:
-            print(e)
+            s.close()
             pass
+    s.close()
 
 def post():
     global postdata
+    global running
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
@@ -72,15 +76,17 @@ def post():
         except:
             print("Couldn't connect to server 9000")
 
-    while True:
+    while running:
         try:
             postdata = s.recv(8192)
         except Exception as e:
-            print(e)
+            s.close()
             pass
+    s.close()
 
 def position():
     global graphdata
+    global running
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
@@ -91,15 +97,17 @@ def position():
         except:
             print("Couldn't connect to server 9000")
 
-    while True:
+    while running:
         try:
             graphdata = s.recv(8192)
         except Exception as e:
-            print(e)
+            s.close()
             pass
+    s.close()
 
 def getanalysis():
     global analysis
+    global running
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
@@ -110,14 +118,16 @@ def getanalysis():
         except:
             print("Couldn't connect to server 10050")
 
-    while True:
+    while running:
         try:
             data = s.recv(512)
             if data != b'':
                 analysis = eval("[[" + re.findall(r'\[\[(.*?)\]\]', data.decode())[0] + "]]")
         except Exception as e:
+            s.close()
             # print(e)
             pass
+    s.close()
 
 def firejson(plot, colors):
     visible = ['false'] * 4
@@ -140,9 +150,10 @@ def firejson(plot, colors):
 def graph():
     global graphdata
     global angles
+    global running
 
     firecoord = db.reference('x_and_y')   
-    while True:
+    while running:
         try:
             coord = graphdata.decode().replace("\n", "")
             result = re.search(r'\[(.*?)\]', coord).group(1)
@@ -249,11 +260,12 @@ def arduino():
     global postdata
     global angles
     global analysis
+    global running
 
     ardhigh = serial.Serial(port='/dev/tty.usbmodem14111301', baudrate=115200)
     ardlow = serial.Serial(port='/dev/tty.usbserial-1411140', baudrate=115200)
 
-    while True:
+    while running:
         try:
             channels = np.frombuffer(postdata, dtype='int16')
             c0 = channels[0::8].tobytes() #red
@@ -324,7 +336,7 @@ def arduino():
             ardhigh.write(out.encode())
             
         except Exception as e:
-            # print(e)
+            print(e)
             pass
 
 #Speech
@@ -519,12 +531,17 @@ if __name__ == "__main__":
     t5 = threading.Thread(target=arduino, daemon=True) 
     t6 = threading.Thread(target=getanalysis, daemon=True) 
 
-    t1.start() 
-    t2.start() 
-    t3.start() 
-    t4.start() 
-    t5.start() 
-    t6.start() 
+    try:
+        t1.start() 
+        t2.start() 
+        t3.start() 
+        t4.start() 
+        t5.start() 
+        t6.start() 
+    except:
+        running = False
+        print("\n\n\n\n\n\n\n\nEnd Thread")
+        sys.exit()
 
     # s1 = threading.Thread(target=main, kwargs={'channelnum': 0})
     # s2 = threading.Thread(target=main, kwargs={'channelnum': 1})
@@ -543,10 +560,6 @@ if __name__ == "__main__":
         # s3.join() 
         # s4.join() 
     except:
-        t1.join() 
-        t2.join() 
-        t3.join() 
-        t4.join() 
-        t5.join() 
-        t6.join() 
-        print("\n\n\n\n\n\n\n\nEnd")
+        running = False
+        print("\n\n\n\n\n\n\n\nEnd Final")
+        sys.exit()

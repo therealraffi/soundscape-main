@@ -15,10 +15,8 @@ def stream(port):
     global ip
     global counts
     global data 
-
     counts[port] = 0
     data[port] = b""
-
     while True:
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -31,7 +29,6 @@ def stream(port):
 
     def accept_connections():
         s.listen(100)
-
         print('Running on IP: ' + ip)
         print('Running on port: '+ str(port))
         
@@ -60,26 +57,28 @@ def stream(port):
                 broadcast(c, data[port])
             except socket.error:
                 c.close()
-
+            except KeyboardInterrupt:
+                c.close()
     connections = []
     accept_connections()
 
 if __name__ == "__main__": 
-    t1 = threading.Thread(target=stream, kwargs={'port': 9000})
-    t2 = threading.Thread(target=stream, kwargs={'port': 10000})
-    t3 = threading.Thread(target=stream, kwargs={'port': 10010})
-    t4 = threading.Thread(target=stream, kwargs={'port': 10050})
+    t1 = threading.Thread(target=stream, kwargs={'port': 9000}, daemon=True)
+    t2 = threading.Thread(target=stream, kwargs={'port': 10000}, daemon=True)
+    t3 = threading.Thread(target=stream, kwargs={'port': 10010}, daemon=True)
+    t4 = threading.Thread(target=stream, kwargs={'port': 10050}, daemon=True)
 
+    t1.start() 
+    t2.start() 
+    t3.start() 
+    t4.start() 
     try:
-        t1.start() 
-        t2.start() 
-        t3.start() 
-        t4.start() 
-
+        while True:
+            time.sleep(1)
+    except:
         t1.join() 
         t2.join() 
         t3.join() 
         t4.join() 
-    except:
+        
         print("\n\n\n\n\n\n\n\nEnd")
-  
