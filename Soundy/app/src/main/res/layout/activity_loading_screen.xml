@@ -93,11 +93,13 @@
             android:autoSizeTextType="uniform"
             android:background="@drawable/radius"
             android:gravity="center"
-            android:padding="7dp"
+            android:paddingTop="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="5dp"
             android:text="DOG"
             android:textColor="@color/second"
             android:textSize="23dp"
-            android:textStyle="bold"
             app:autoSizeMaxTextSize="100dp"
             app:autoSizeMinTextSize="20dp"
             app:autoSizeStepGranularity="20dp"
@@ -116,11 +118,13 @@
             android:autoSizeTextType="uniform"
             android:background="@drawable/radius"
             android:gravity="center"
-            android:padding="7dp"
-            android:text="DOG"
+            android:paddingLeft="16dp"
+            android:paddingTop="5dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="5dp"
+            android:text="Lot's of Text to test"
             android:textColor="@color/third"
             android:textSize="23dp"
-            android:textStyle="bold"
             app:autoSizeMaxTextSize="100dp"
             app:autoSizeMinTextSize="20dp"
             app:autoSizeStepGranularity="20dp"
@@ -129,7 +133,7 @@
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.814" />
+            app:layout_constraintVertical_bias="0.833" />
 
         <TextView
             android:id="@+id/text4"
@@ -139,11 +143,13 @@
             android:autoSizeTextType="uniform"
             android:background="@drawable/radius"
             android:gravity="center"
-            android:padding="20dp"
+            android:paddingTop="5dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="5dp"
             android:text="Random"
             android:textColor="@color/fourth"
             android:textSize="23dp"
-            android:textStyle="bold"
             app:autoSizeMaxTextSize="100dp"
             app:autoSizeMinTextSize="20dp"
             app:autoSizeStepGranularity="20dp"
@@ -152,7 +158,7 @@
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.993" />
+            app:layout_constraintVertical_bias="0.959" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -250,8 +250,8 @@ def arduino():
     global angles
     global analysis
 
-    ardhigh = serial.Serial(port='/dev/tty.usbmodem142301', baudrate=115200)
-    ardlow = serial.Serial(port='/dev/tty.usbserial-141110', baudrate=115200)
+    ardhigh = serial.Serial(port='/dev/tty.usbmodem14111301', baudrate=115200)
+    ardlow = serial.Serial(port='/dev/tty.usbserial-1411140', baudrate=115200)
 
     while True:
         try:
