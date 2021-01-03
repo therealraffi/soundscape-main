@@ -16,6 +16,7 @@ import android.graphics.Path;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.Window;
@@ -76,6 +77,7 @@ public class LoadingScreen extends AppCompatActivity {
         text[3]=findViewById(R.id.text4);
 
 
+
         ObjectAnimator scaleDown = ObjectAnimator.ofPropertyValuesHolder(
                 filled,
                 PropertyValuesHolder.ofFloat("scaleX", 1.1f),
@@ -93,7 +95,7 @@ public class LoadingScreen extends AppCompatActivity {
             orb[i].setVisibility(View.GONE);
 
         final float centerX= (float) (w()/2.0);
-        final float centerY = (float) (h()*0.5);
+        final float centerY = (float) (h()*0.3);
         int filledRadius = (int) (w()*0.55);
         final int circleRadius = (int) (w()*0.8);
         int circleRadius1 =  (int) (w()*0.84);
@@ -115,9 +117,15 @@ public class LoadingScreen extends AppCompatActivity {
                 int count=0;
                 for (DataSnapshot snapshot: dataSnapshot.getChildren())
                 {
+
                     isSpeaking[count]=  snapshot.child("speaking").getValue().toString();
                     content[count] = snapshot.child("content").getValue().toString();
                     classification[count] = snapshot.child("classification").getValue().toString();
+                    if (isSpeaking[count].equals("true")) {
+                        text[count].setTextSize(TypedValue.COMPLEX_UNIT_DIP,15);
+                        text[count].setText(content[count]);
+                    }
+
                     count++;
                 }
             }
@@ -137,7 +145,10 @@ public class LoadingScreen extends AppCompatActivity {
                     String visibility = snapshot.child("visibility").getValue().toString();
                     if (visibility.equals("true"))
                     {
-                        text[count].setText(classification[count]);
+                        if (isSpeaking[count].equals("false")) {
+                            text[count].setTextSize(TypedValue.COMPLEX_UNIT_DIP,23);
+                            text[count].setText(classification[count]);
+                        }
                         String[] val = snapshot.child("cords").getValue().toString().split(" ");
                         //orb[count].setColorFilter(Color.parseColor(colors[count]));
                         float sampleX = Float.parseFloat(val[0]);
