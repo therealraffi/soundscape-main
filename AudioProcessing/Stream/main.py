@@ -315,8 +315,8 @@ def arduino():
             # print(analysis)
             # print(motors)
             # print("\n\n")
-
-            print("%3s %6s \t %3s %6s \t %3s %6s \t %3s %6s" % (analysis[0][0], analysis[0][1], analysis[1][0], analysis[1][1], analysis[2][0], analysis[2][1], analysis[3][0], analysis[3][1]), amplitude(postdata) * "|")
+            amp = max(analysis[0][0], analysis[1][0], analysis[2][0], analysis[3][0])
+            print("%3s %6s \t %3s %6s \t %3s %6s \t %3s %6s" % (analysis[0][0], analysis[0][1], analysis[1][0], analysis[1][1], analysis[2][0], analysis[2][1], analysis[3][0], analysis[3][1]), amp * "|")
 
             low = [0] * 6
             high = [0] * 6

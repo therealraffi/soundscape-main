@@ -51,8 +51,10 @@ public class LoadingScreen extends AppCompatActivity {
     TextView[] text ;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().setStatusBarColor(Color.parseColor("#f72585"));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading_screen);
         getSupportActionBar().hide();
@@ -80,8 +82,8 @@ public class LoadingScreen extends AppCompatActivity {
 
         ObjectAnimator scaleDown = ObjectAnimator.ofPropertyValuesHolder(
                 filled,
-                PropertyValuesHolder.ofFloat("scaleX", 1.1f),
-                PropertyValuesHolder.ofFloat("scaleY", 1.1f));
+                PropertyValuesHolder.ofFloat("scaleX", 1.2f),
+                PropertyValuesHolder.ofFloat("scaleY", 1.2f));
         scaleDown.setDuration(1500);
 
         scaleDown.setRepeatCount(ObjectAnimator.INFINITE);
