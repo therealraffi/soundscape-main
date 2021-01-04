@@ -33,14 +33,3 @@ for angle, channel in angles:
                 break
     motors[ind] = [max(analysis[channel][0] * 80/100, 0), analysis[channel][1]] if analysis[channel][0] > 3 else 0
 
-            c0 = channels[0::8].tobytes() #red
-            c1 = channels[1::8].tobytes() #green
-            c2 = channels[2::8].tobytes() #blue
-            c3 = channels[3::8].tobytes() #purple
-
-            orig = [amplitude(c0), amplitude(c1), amplitude(c2), amplitude(c3)]
-
-            temp[0] = [amplitude(c0) if orig[0] != -1 else -1, avgfreq(c0)]
-            temp[1] = [amplitude(c1) if orig[1] != -1 else -1, avgfreq(c1)]
-            temp[2] = [amplitude(c2) if orig[2] != -1 else -1, avgfreq(c2)]
-            temp[3] = [amplitude(c3) if orig[3] != -1 else -1, avgfreq(c3)]

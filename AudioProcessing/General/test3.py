@@ -1,85 +1,71 @@
-import socket
-import threading
-import numpy as np
-import re
-import math
-import struct
-import time
+def live():
+        global running
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-#Local IP
-ip = socket.gethostbyname(socket.gethostname())
-counts = {}
-data = {}
-
-def stream(port):
-    global ip
-    global counts
-    global data 
-
-    counts[port] = 0
-    data[port] = b""
-
-    while True:
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            #Open up local port
-            s.bind((ip, port))
-            break
-        except Exception as e:
-            # print(e)
-            print("Couldn't bind to that port %s" % (port))
-
-    def accept_connections():
-        s.listen(100)
-
-        print('Running on IP: ' + ip)
-        print('Running on port: '+ str(port))
-        
         while True:
-            try:
-                c, addr = s.accept()
-                connections.append(c)
-                threading.Thread(target=handle_client, args=(c, addr, counts[port])).start()
-            except KeyboardInterrupt:
-                c.close()
-        
-    def broadcast(sock, data):
-        for client in connections:
-            if client != s and client != sock:
-                try:
-                    client.send(data)
-                except:
-                    pass
+                target_ip = "35.186.188.127"
+                target_port = 10000
+                s.connect((target_ip, target_port))
+                break
 
-    def handle_client(c, addr, counter):
-        counts[port] += 1
-        while True:
-            try:
-                if counter == 0:
-                    data[port] = c.recv(8192)
-                broadcast(c, data[port])
-            except socket.error:
-                c.close()
+        CHUNK = 4096 # 512
+        audio_format = pyaudio.paInt16
+        channels = 1
+        RATE = 44100 
+        cRATE = 22050 
 
-    connections = []
-    accept_connections()
+        print("Connected to Server") 
+ 
+        fm, f0, f1, f2, f3 = [], [], [], [], [] 
+        n = 25 
+         
+        global ind 
+        ind = 0 
+        i = 0 
+        data = np.array([]) 
+ 
+        threading.Thread(target=live_classification,args=(model,device,classes, CHUNK, n), daemon=True).start() 
+        threading.Thread(target=live_classification,args=(model,device,classes, CHUNK, n), daemon=True).start() 
+        threading.Thread(target=live_classification,args=(model,device,classes, CHUNK, n), daemon=True).start() 
+        #threading.Thread(target=live_classification,args=(model,device,classes, CHUNK, n)).start() 
+        #threading.Thread(target=live_classification,args=(model,device,classes, CHUNK, n)).start() 
+        #threading.Thread(target=live_classification,args=(model,device,classes, CHUNK, n)).start() 
+        #threading.Thread(target=live_classification,args=(model,device,classes, CHUNK, n)).start() 
+ 
+        s.settimeout(5) 
+ 
+        while running: 
+                try: 
+                        d = s.recv(CHUNK)
 
-if __name__ == "__main__": 
-    t1 = threading.Thread(target=stream, kwargs={'port': 9000})
-    t2 = threading.Thread(target=stream, kwargs={'port': 10000})
-    t3 = threading.Thread(target=stream, kwargs={'port': 10010})
-    t4 = threading.Thread(target=stream, kwargs={'port': 10050})
+                        c0 = channels[0::8].tobytes() #red
+                        c1 = channels[1::8].tobytes() #green
+                        c2 = channels[2::8].tobytes() #blue
+                        c3 = channels[3::8].tobytes() #purple
 
-    try:
-        t1.start() 
-        t2.start() 
-        t3.start() 
-        t4.start() 
+                        if not d: break
+                        data = np.concatenate([data, np.frombuffer(d, dtype=np.int16)])
+                                #threading.Thread(target=live_classification,args=(model,device,classes, CHUNK, n)).start()
+                        channels = np.frombuffer(data, dtype='float32')
 
-        t1.join() 
-        t2.join() 
-        t3.join() 
-        t4.join() 
-    except:
-        print("\n\n\n\n\n\n\n\nEnd")
-  
+                        fm.append(data)
+                        # f0.append(c0.tobytes())
+                        # f1.append(c1.tobytes())
+                        # f2.append(c2.tobytes())
+                        # f3.append(c3.tobytes())
+
+                        # f3[-1]
+                        if i % n == 0 and i != 0:
+                                ind +=1
+                                queue.append(data)
+                                data = np.array([])
+                                #queue.append([])
+                                sprint("len", len(queue))
+                        i+=1
+
+                except socket.timeout:
+                        print('lag')
+                        s.close()
+                except KeyboardInterrupt as e:
+                        print("Client Disconnected")
+                        s.close()
