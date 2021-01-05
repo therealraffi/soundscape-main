@@ -4,8 +4,10 @@ env/*
 py16/*
 py37/*
 envp/*
+Classifiers/urb/*
 
 **/ESC50
+**/data
 Classifiers/ESC50/
 **/ESC-50
 **/chainer
@@ -38,6 +40,8 @@ Classifiers/ESC50/
 *.pkl
 *.pkl
 *.hdf5
+*.ckpt
+*.ckpt'
 *.pth
 *.DS_Store
 */.DS_Store
