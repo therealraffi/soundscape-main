@@ -26,6 +26,7 @@ from threading import Lock
 import pyaudio
 import wave
 import struct
+#import socket.timeout as TimeoutException
 
 # Fetch the service account key JSON file contents
 cred = credentials.Certificate('../fire.json')
@@ -56,7 +57,7 @@ def evaluate(model, device, test_loader, classes):
 			elif(len(target) == 0):
                                 print('Predicted:', classes[predicted[0]], 'Actual: NONE')
 			else:
-				print('Predicted:', classes[predicted[0]], 'Actual:', classes[target[0]])
+				print('Predicted:', [classes[j] for j in predicted], 'Actual:', classes[target[0]])
 			total += target.size(0)
 			correct += (predicted == target).sum().item()
 
@@ -76,11 +77,13 @@ def predict(model, device, classes, clip, sr):
 	outputs = model(inputs)
 	_, predicted = torch.max(outputs.data, 1)
 	pred = classes[predicted[0]].replace('\n', '')
+	pred = [classes[i].replace('\n', '') for i in predicted]
 
 	ref = db.reference('x_and_y')
 	ref.child("sound1").child("classification").set(pred)
 
-	print('Predicted:', pred)
+	#print('Predicted:', pred)
+	return pred
 
 def process(clip, sr):
 	num_channels = 3
@@ -127,38 +130,31 @@ def receive_server_data():
 			pass
 
 def live_classification(model, device, classes, chunk, n):
-	while(len(queue) > n):
-		data = np.array([])
-		for i in range(n):
-			data = np.concatenate([data, np.frombuffer(queue.pop(0), dtype=np.int16)])
-		#data = np.frombuffer(queue.pop(0), dtype=np.int16)
-		#d = queue.pop(0)
-
-		#print(len(d))
-		#data = np.array(struct.unpack(str(chunk) + 'B', d), dtype='b')
-		#scalar = np.full(1, 128)
-
-		#da = np.add(data, scalar)
-		#np.hstack(da)
-
-		#de = da.astype('float32')
-		#print(de)
-
-		#print(data)
-		mono = data / 32768
-		#print(mono)
-		predict(model, device, classes, mono, SAMPLE_RATE)
+	global running
+	running = True
+	while(running):
+		if(len(queue) > 0):
+			data = queue.pop(0)
+			mono = data / 32768
+			sprint("Predicted: ", predict(model, device, classes, mono, SAMPLE_RATE))
+			sprint("Queue Length: ", len(queue))
+			#print(mono)
+			sprint("data ", data[:50])
 
 def live():
+	global running
+	running = True
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 	while True:
-		target_ip = "98.169.167.38"
-		target_port = 5500
+		#target_ip = "98.169.167.38"
+		#target_port = 5500
+		target_ip = "35.186.188.127"
+		target_port = 10000
 		s.connect((target_ip, target_port))
 		break
 
-	CHUNK = 1448 # 512
+	CHUNK = 8192 # 512
 	audio_format = pyaudio.paInt16
 	channels = 1
 	RATE = 44100
@@ -167,48 +163,54 @@ def live():
 	print("Connected to Server")
 
 	fm, f0, f1, f2, f3 = [], [], [], [], []
+	n = 25
+	global ind
+	ind = 0
+	i = 0
+	data = np.array([])
+	
+	threading.Thread(target=live_classification,args=(model,device,classes, CHUNK, n), daemon=True).start()
+	threading.Thread(target=live_classification,args=(model,device,classes, CHUNK, n), daemon=True).start()
+	threading.Thread(target=live_classification,args=(model,device,classes, CHUNK, n), daemon=True).start()
 
-	data = s.recv(CHUNK)
-	queue.append(data)
-	threading.Thread(target=live_classification,args=(model,device,classes, CHUNK)).start()
+	s.settimeout(5)
 
-	n = 10
-	while True:
+	while running:
 		try:
-			data = s.recv(CHUNK)
-			if not data: break
-			if len(data) != CHUNK: sprint(len(data))
-			queue.append(data)
-			if(len(queue) > 10):
-				threading.Thread(target=live_classification,args=(model,device,classes, CHUNK, n)).start()
+			d = s.recv(CHUNK)
 			channels = np.frombuffer(data, dtype='float32')
-			# c0 = channels[0::8] #red
-                	# c1 = channels[1::8] #green
-                	# c2 = channels[2::8] #blue
-                	# c3 = channels[3::8] #purple
+			c0 = channels[0::8].tobytes() #red
+			c1 = channels[1::8].tobytes() #green
+			c2 = channels[2::8].tobytes() #blue
+			c3 = channels[3::8].tobytes() #purple
+			if not d: break
+			data = np.concatenate([data, np.frombuffer(d, dtype=np.int16)])
+			#threading.Thread(target=live_classification,args=(model,device,classes, CHUNK, n)).start()
 
 			fm.append(data)
-                	# f0.append(c0.tobytes())
-                	# f1.append(c1.tobytes())
-                	# f2.append(c2.tobytes())
-        	        # f3.append(c3.tobytes())
 
-	                # f3[-1]
+			if i % n == 0 and i != 0:
+				ind +=1
+				queue.append(data)
+				data = np.array([])
+				#queue.append([])
+				sprint("len", len(queue))
+			i+=1
 
-		except KeyboardInterrupt as e:
+		except Exception as e:
+			running=False
 			print("Client Disconnected")
-			done = True
 			save("combined.wav", 1, RATE, fm)
 
 		        # save("channel0.wav", 1, cRATE, f0)
 			# save("channel1.wav", 1, cRATE, f1)
 			# save("channel2.wav", 1, cRATE, f2)
 			# save("channel3.wav", 1, cRATE, f3)
-
+			s.close()
 			print("Done Saving")
 			break
 	save("combined.wav", 1, RATE, fm)
-
+	s.close()
 def sprint(*a, **b):
     """Thread safe print function"""
     with lock:
@@ -217,12 +219,13 @@ def sprint(*a, **b):
 
 CONFIG_PATH = 'config/esc_densenet.json'
 CLASS_PATH = '../ESC-classes.txt'
-WEIGHT_PATH = 'checks/model_best_1.pth.tar'
+WEIGHT_PATH = 'checks/model_best_5.pth.tar'
 SAMPLE_RATE = 44100
-filename = "combined.wav"
-GPU = "0"
+filename = "baby_cry.wav"
+GPU = "1"
 global queue
 global done
+global running
 done = False
 queue = []
 lock = Lock()
@@ -230,7 +233,7 @@ lock = Lock()
 print("Preprocessing...")
 
 clip, sr = librosa.load(filename)
-#print(clip * 32768)
+#print(clip[100:] * 32768)
 
 params = utils.Params(CONFIG_PATH)
 
@@ -244,9 +247,11 @@ classes=[]
 for c in open(CLASS_PATH, 'r'):
 	classes.append(c)
 
+print("Started")
+
 #test(model, device, classes, params)
 
-predict(model, device, classes, clip, SAMPLE_RATE)
+#print("Predicted: ", predict(model, device, classes, clip, SAMPLE_RATE))
 
-#live()
+live()
 

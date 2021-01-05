@@ -43,8 +43,8 @@ WORKERS_TRAIN = 0
 WORKERS_TEST = 0
 EPOCHS = 100
 LOG_INTERVAL = 50
-#SAVED_MODELS_PATH = os.path.join(os.path.expanduser('~'), 'saved_models')
-SAVED_MODELS_PATH = "~/ISEF2021/Classifiers/ESResNet"
+SAVED_MODELS_PATH = os.path.join(os.path.expanduser('~'), 'saved_models')
+
 
 def run(experiment_name: str,
         visdom_host: str,

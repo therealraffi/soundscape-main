@@ -70,7 +70,7 @@ def train_and_evaluate(model, device, train_loader, val_loader, optimizer, loss_
 if __name__ == "__main__":
     args = parser.parse_args()
     params = utils.Params(args.config_path)
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
     for i in range(1, params.num_folds+1):
         if params.dataaug:
