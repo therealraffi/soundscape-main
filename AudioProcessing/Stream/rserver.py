@@ -12,11 +12,11 @@ mic = pyaudio.PyAudio()
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
-CHUNK = 1448//2
+CHUNK = 8192//2
 RECORD_SECONDS = 1.5
 
 stream = mic.open(format=FORMAT, channels=CHANNELS, rate=RATE,
-                  input_device_index=1,
+                  input_device_index=2,
                   input=True, frames_per_buffer=CHUNK)
 
 fm = []
@@ -51,7 +51,11 @@ def accept_connections():
             connections.append(c)
             threading.Thread(target=handle_client,args=(c,addr)).start()
         except KeyboardInterrupt as e:
-            exit()
+            print(e)
+            save("server-combined.wav", 1, RATE, fm)
+            print('Saved')
+            c.close()
+            exit(0)       
 
 def broadcast(sock, data):
     for client in connections:
@@ -79,14 +83,7 @@ def handle_client(c, addr):
 
             print(len(data))
             fm.append(data)
-            broadcast(c, data)
-
-        except KeyboardInterrupt:
-            print(e)
-            save("server-combined.wav", 1, RATE, fm)
-            print('Saved')
-            c.close()
-            exit()            
+            broadcast(c, data)     
 
         except Exception as e:
             print(e)
@@ -96,3 +93,4 @@ def handle_client(c, addr):
 
 connections = []
 accept_connections()
+
