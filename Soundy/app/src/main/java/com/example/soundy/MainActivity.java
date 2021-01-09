@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         //init
         getSupportActionBar().hide();
         VideoView videoView = (VideoView) findViewById(R.id.videoView);  //casting to VideoView is not Strictly required above API level 26
-        videoView.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.ringlogo); //set the path of the video that we need to use in our VideoView
+        videoView.setVideoPath("android.resource://" + getPackageName() + "/" + R.raw.loading); //set the path of the video that we need to use in our VideoView
         videoView.start();
 
         new Handler().postDelayed(new Runnable() {
