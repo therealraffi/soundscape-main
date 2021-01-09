@@ -543,22 +543,9 @@ if __name__ == "__main__":
         print("\n\n\n\n\n\n\n\nEnd Thread")
         sys.exit()
 
-    # s1 = threading.Thread(target=main, kwargs={'channelnum': 0})
-    # s2 = threading.Thread(target=main, kwargs={'channelnum': 1})
-    # s3 = threading.Thread(target=main, kwargs={'channelnum': 2})
-    # s4 = threading.Thread(target=main, kwargs={'channelnum': 3})
-    # s1.start() 
-    # s2.start() 
-    # s3.start() 
-    # s4.start() 
     try:
         while True:
             time.sleep(1)
-
-        # s1.join() 
-        # s2.join() 
-        # s3.join() 
-        # s4.join() 
     except:
         running = False
         print("\n\n\n\n\n\n\n\nEnd Final")

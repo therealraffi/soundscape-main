@@ -367,7 +367,7 @@ class _ESResNet(ResNet):
         if isinstance(self.pretrained, bool):
             state_dict = self.loading_func(pretrained=True).state_dict()
         else:
-            state_dict = torch.load(self.pretrained, map_location='cpu')
+            state_dict = torch.load(self.pretrained, map_location='cuda:0')
 
         err_msg = ''
         try:
