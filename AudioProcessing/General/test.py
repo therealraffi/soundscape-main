@@ -1,16 +1,17 @@
-ignore = 120
+ignore = 90
 angles = [[288.2106840638463, 1], [168.3565152243961, 2], [255.48778514717512, 3]]
 motors = [0] * 6
 inc = (360 - ignore) / 5
-analysis = []
+analysis = [[43, 213], [13, 402], [43, 213], [10, 316]]
 
 possible = [(180 + ignore)/2 + i * inc for i in range(5)]
 possible.insert(0, (180 - ignore)/2)
 
 print(motors, possible, angles)
+print(possible)
+
 for angle, channel in angles:
     ind = 0
-    print(angle, channel)
     for c, k in enumerate(possible):
         if k - inc/2 <= angle <= k + inc/2:
             ind = c
@@ -31,5 +32,6 @@ for angle, channel in angles:
                         break
             else:
                 break
-    motors[ind] = [max(analysis[channel][0] * 80/100, 0), analysis[channel][1]] if analysis[channel][0] > 3 else 0
-
+    motors[ind] = [max(analysis[channel][0] * 80/100, 0), analysis[channel][1]] if analysis[channel][0] > 5 else 0
+    print(angle, channel, motors)
+print(motors)

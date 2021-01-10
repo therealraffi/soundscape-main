@@ -262,8 +262,8 @@ def arduino():
     global analysis
     global running
 
-    ardhigh = serial.Serial(port='/dev/tty.usbmodem14111301', baudrate=115200)
     ardlow = serial.Serial(port='/dev/tty.usbserial-1411140', baudrate=115200)
+    ardhigh = serial.Serial(port='/dev/tty.usbserial-1411130', baudrate=115200)
 
     while running:
         try:
@@ -274,7 +274,7 @@ def arduino():
             c3 = channels[3::8].tobytes() #purple
 
             # analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
-            ignore = 120
+            ignore = 90
 
             for c in range(len(angles) - 1, -1, -1):
                 i = angles[c]
@@ -309,13 +309,16 @@ def arduino():
                                     break
                         else:
                             break
-                motors[ind] = [max(analysis[channel][0] * 80/100, 0), analysis[channel][1]] if analysis[channel][0] > 3 else 0
+                #amplitude should be between 0 and 100 since arduino mulplies pwm by 2.55
+                motors[ind] = [max(analysis[channel][0] * 90/100, 0), analysis[channel][1]] if analysis[channel][0] > 0 else 0
 
             # print(angles)
             # print(analysis)
             # print(motors)
             # print("\n\n")
-            amp = max(analysis[0][0], analysis[1][0], analysis[2][0], analysis[3][0])
+            # amp = max(analysis[0][0], analysis[1][0], analysis[2][0], analysis[3][0])
+            amp = amplitude(postdata)
+
             print("%3s %6s \t %3s %6s \t %3s %6s \t %3s %6s" % (analysis[0][0], analysis[0][1], analysis[1][0], analysis[1][1], analysis[2][0], analysis[2][1], analysis[3][0], analysis[3][1]), amp * "|")
 
             low = [0] * 6
@@ -329,6 +332,9 @@ def arduino():
                 else:
                     low[c] = i[0]
 
+            # print(high)
+            # print(low)
+
             out = "<%s, %s, %s, %s, %s, %s>" % (low[0], low[1], low[2], low[3], low[4], low[5])
             ardlow.write(out.encode())
             
@@ -338,6 +344,8 @@ def arduino():
         except Exception as e:
             print(e)
             pass
+    ardlow.close()
+    ardhigh.close()
 
 #Speech
 
@@ -540,6 +548,7 @@ if __name__ == "__main__":
         t6.start() 
     except:
         running = False
+        time.sleep(0.1)
         print("\n\n\n\n\n\n\n\nEnd Thread")
         sys.exit()
 
@@ -548,5 +557,6 @@ if __name__ == "__main__":
             time.sleep(1)
     except:
         running = False
+        time.sleep(0.1)
         print("\n\n\n\n\n\n\n\nEnd Final")
         sys.exit()
