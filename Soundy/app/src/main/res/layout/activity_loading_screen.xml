@@ -72,17 +72,18 @@
             android:paddingTop="5dp"
             android:paddingRight="16dp"
             android:paddingBottom="5dp"
-            android:text="Dog"
+            android:text=""
             android:textColor="@color/fourth"
-            android:textSize="23dp"
+            android:textSize="17dp"
             app:autoSizeMaxTextSize="100dp"
             app:autoSizeMinTextSize="20dp"
             app:autoSizeStepGranularity="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.621" />
+            app:layout_constraintVertical_bias="0.618" />
 
         <TextView
             android:id="@+id/text2"
@@ -96,18 +97,18 @@
             android:paddingTop="5dp"
             android:paddingRight="16dp"
             android:paddingBottom="5dp"
-            android:text="DOG"
+            android:text=""
             android:textColor="@color/third"
-            android:textSize="23dp"
+            android:textSize="17dp"
             app:autoSizeMaxTextSize="100dp"
             app:autoSizeMinTextSize="20dp"
             app:autoSizeStepGranularity="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.51"
+            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.74" />
+            app:layout_constraintVertical_bias="0.732" />
 
         <TextView
             android:id="@+id/text3"
@@ -121,17 +122,18 @@
             android:paddingTop="5dp"
             android:paddingRight="16dp"
             android:paddingBottom="5dp"
-            android:text="Lot's of Text to test"
+            android:text=""
             android:textColor="@color/first"
-            android:textSize="23dp"
+            android:textSize="17dp"
             app:autoSizeMaxTextSize="100dp"
             app:autoSizeMinTextSize="20dp"
             app:autoSizeStepGranularity="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.853" />
+            app:layout_constraintVertical_bias="0.852" />
 
         <TextView
             android:id="@+id/text4"
@@ -145,9 +147,9 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:paddingBottom="5dp"
-            android:text="Random"
+            android:text=""
             android:textColor="@color/second"
-            android:textSize="23dp"
+            android:textSize="17dp"
             app:autoSizeMaxTextSize="100dp"
             app:autoSizeMinTextSize="20dp"
             app:autoSizeStepGranularity="20dp"

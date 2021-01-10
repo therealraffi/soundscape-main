@@ -54,7 +54,7 @@ public class LoadingScreen extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getWindow().setStatusBarColor(Color.parseColor("#f72585"));
+        getWindow().setStatusBarColor(Color.parseColor("#06d6a0"));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading_screen);
         getSupportActionBar().hide();
@@ -124,7 +124,7 @@ public class LoadingScreen extends AppCompatActivity {
                     content[count] = snapshot.child("content").getValue().toString();
                     classification[count] = snapshot.child("classification").getValue().toString();
                     if (isSpeaking[count].equals("true")) {
-                        text[count].setTextSize(TypedValue.COMPLEX_UNIT_DIP,15);
+                        text[count].setTextSize(TypedValue.COMPLEX_UNIT_DIP,10);
                         text[count].setText(content[count]);
                     }
 
@@ -148,7 +148,7 @@ public class LoadingScreen extends AppCompatActivity {
                     if (visibility.equals("true"))
                     {
                         if (isSpeaking[count].equals("false")) {
-                            text[count].setTextSize(TypedValue.COMPLEX_UNIT_DIP,23);
+                            text[count].setTextSize(TypedValue.COMPLEX_UNIT_DIP,10);
                             text[count].setText(classification[count]);
                         }
                         String[] val = snapshot.child("cords").getValue().toString().split(" ");
@@ -180,6 +180,7 @@ public class LoadingScreen extends AppCompatActivity {
                             constantX=1;
                             constantY=-1;
                         }
+
                         float deg = (float) Math.atan(sampleY/sampleX);
                         sampleX = (float) (Math.cos(deg)*circleRadius/2.0*constantX +centerX);
                         sampleY = (float) (Math.sin(deg)*circleRadius/2.0*constantY +centerY);
