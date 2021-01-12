@@ -1,16 +1,17 @@
+#ac
 import torch
 import torchvision
 import torch.nn as nn
 import numpy as np
 import json
 import utils
-import validate
+import validate #Directory
 import argparse
 import models.densenet
 import models.resnet
-import models.inception
+import models.inception #Directory
 import time
-import dataloaders.datasetaug
+import dataloaders.datasetaug #Directory
 import dataloaders.datasetnormal
 import torchaudio
 import librosa
@@ -26,7 +27,15 @@ from threading import Lock
 import pyaudio
 import wave
 import struct
-#import socket.timeout as TimeoutException
+
+from ac.loader import predict_dense
+from esclass.loader import predict_resnet
+from urban.loader import predict_cnn
+from urban.loader import predict_talnet
+
+from urban.model_CNN10TL_training import CNN10Classifier
+from urban.model_TALNetV3_training import TALNetV3Classifier
+from torchvision.models import resnet34
 
 # Fetch the service account key JSON file contents
 cred = credentials.Certificate('../fire.json')
@@ -36,84 +45,6 @@ firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://soundy-8d98a-default-rtdb.firebaseio.com/'
 })
 
-
-def evaluate(model, device, test_loader, classes):
-	correct = 0
-	total = 0
-	model.eval()
-	with torch.no_grad():
-		for batch_idx, data in enumerate(test_loader):
-			inputs = data[0].to(device)
-			print(inputs.size())
-			target = data[1].squeeze(1).to(device)
-			outputs = model(inputs)
-
-			_, predicted = torch.max(outputs.data, 1)
-			#print(' '.join('%5s' % classes[predicted[j]] for j in range(2)))
-			if(len(predicted) == 0 and len(target) == 0):
-                                print('Predicted: NONE', 'Actual: NONE')
-			elif(len(predicted) == 0):
-                        	print('Predicted: NONE', 'Actual:', classes[target[0]])
-			elif(len(target) == 0):
-                                print('Predicted:', classes[predicted[0]], 'Actual: NONE')
-			else:
-				print('Predicted:', [classes[j] for j in predicted], 'Actual:', classes[target[0]])
-			total += target.size(0)
-			correct += (predicted == target).sum().item()
-
-	return (100*correct/total)
-
-def test(model, device, classes, params):
-
-	for i in range(1, params.num_folds+1):
-		val_loader = dataloaders.datasetaug.fetch_dataloader("{}validation128mel{}.pkl".format(params.data_dir, i), params.dataset_name, params.batch_size, params.num_workers, 'validation')
-		train_loader = dataloaders.datasetaug.fetch_dataloader( "{}training128mel{}.pkl".format(params.data_dir, i), params.dataset_name, params.batch_size, params.num_workers, 'train')
-
-	print(evaluate(model, device, val_loader, classes))
-	#print(evaluate(model, device, train_loader, classes))
-
-def predict_dense(model, device, classes, clip, sr):
-	inputs = process(clip, sr).to(device)
-	outputs = model(inputs)
-	_, predicted = torch.max(outputs.data, 1)
-	pred = classes[predicted[0]].replace('\n', '')
-	pred = [classes[i].replace('\n', '') for i in predicted]
-
-	ref = db.reference('x_and_y')
-	ref.child("sound1").child("classification").set(pred)
-
-	#print('Predicted:', pred)
-	return pred
-
-def process(clip, sr):
-	num_channels = 3
-	window_sizes = [25, 50, 100]
-	hop_sizes = [10, 25, 50]
-	centre_sec = 2.5
-	specs = []
-
-	for i in range(num_channels):
-		window_length = int(round(window_sizes[i]*SAMPLE_RATE/1000))
-		hop_length = int(round(hop_sizes[i]*SAMPLE_RATE/1000))
-
-		clip = torch.Tensor(clip)
-		#print(clip[:50])
-		#sprint(clip)
-		#sprint(clip.shape)
-		spec = torchaudio.transforms.MelSpectrogram(SAMPLE_RATE, n_fft=4410, win_length=window_length, hop_length=hop_length, n_mels=128)(clip)
-		#print(spec.shape)
-		eps = 1e-6
-		spec = spec.numpy()
-		spec = np.log(spec+ eps)
-		spec = np.asarray(torchvision.transforms.Resize((128, 250))(Image.fromarray(spec)))
-		specs.append(spec)
-
-	specs = np.array(specs)
-	values = torch.Tensor(specs)
-	values = values.reshape(1, 3, 128, 250)
-
-	return values
-
 def save(name, channels, rate, frames):
 	wf = wave.open(name, 'wb')
 	wf.setnchannels(channels)
@@ -122,13 +53,6 @@ def save(name, channels, rate, frames):
 	wf.writeframes(b''.join(frames))
 	wf.close()
 
-def receive_server_data():
-	while True:
-		try:
-			data = s.recv(8192)
-		except:
-			pass
-
 def live_classification(model, device, classes, chunk, n):
 	global running
 	running = True
@@ -136,7 +60,7 @@ def live_classification(model, device, classes, chunk, n):
 		if(len(queue) > 0):
 			data = queue.pop(0)
 			mono = data / 32768
-			sprint("Predicted: ", predict(model, device, classes, mono, SAMPLE_RATE))
+			sprint("Predicted: ", predict_densenet(model, device, classes, mono, SAMPLE_RATE))
 			sprint("Queue Length: ", len(queue))
 			#print(mono)
 			sprint("data ", data[:50])
@@ -216,13 +140,10 @@ def sprint(*a, **b):
     with lock:
         print(*a, **b)
 
-
-CONFIG_PATH = 'config/esc_densenet.json'
 CLASS_PATH = '../ESC-classes.txt'
-WEIGHT_PATH = 'checks/model_best_5.pth.tar'
 SAMPLE_RATE = 44100
 filename = "baby_cry.wav"
-GPU = "1"
+# GPU = "1"
 global queue
 global done
 global running
@@ -234,14 +155,49 @@ print("Preprocessing...")
 
 clip, sr = librosa.load(filename)
 #print(clip[100:] * 32768)
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device1 = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+device2 = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
 
+
+############################ densenet
+CONFIG_PATH = 'ac/config/esc_densenet.json'
 params = utils.Params(CONFIG_PATH)
+dense_path = 'ac/checks/model_best_5.pth.tar'
+modeld = models.densenet.DenseNet(params.dataset_name, params.pretrained).to(device)
+modeld.load_state_dict(torch.load(dense_path)['model'])
+modeld.eval()
 
-device = torch.device("cuda:"+GPU if torch.cuda.is_available() else "cpu")
+############################ resnet
+resnet_path = 'esclass/esc50resnet.pth'
+weights = torch.load(resnet_path, map_location='cpu')
+modelr = weights.to(device)
+modelr.eval()
 
-model = models.densenet.DenseNet(params.dataset_name, params.pretrained).to(device)
-model.load_state_dict(torch.load(WEIGHT_PATH)['model'])
-model.eval()
+mixup_augmenter = Mixup(float(cparams["alpha"]), int(cparams["seed"]))
+
+############################ cnn10
+CNN_PATH = "urban/checks/CNN10TL/CNN10TL-epoch306.ckpt"
+CNN_HPARAMS = "data/summaries/CNN10TLAllDatasets/logs/default/version_14/hparams.yaml"
+cparams = {}
+for line in open(CNN_HPARAMS, 'r').read().splitlines():
+    k, v = line.split(": ")
+    cparams[k] = v
+
+modelc = CNN10Classifier.load_from_checkpoint(
+    CNN_PATH, 
+    hparams=cparams,
+    fold=1
+)
+modelc = modelc.to(device)
+modelc.eval()
+
+############################ talnetv3
+TALNET_PATH = 'urban/checks/TALNetV3/TALNetV3-epoch148.ckpt'
+TALNET_HPARAMS = "data/summaries/TALNetV3AllDatasets/logs/default/version_9/hparams.yaml"
+modelt = TALNetV3Classifier.load_from_checkpoint(TALNET_PATH, hparams=tparams, fold=1)
+modelt = modelt.to(device)
+modelt.eval()
 
 classes=[]
 for c in open(CLASS_PATH, 'r'):

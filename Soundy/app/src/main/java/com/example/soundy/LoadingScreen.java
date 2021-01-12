@@ -37,6 +37,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 
@@ -138,6 +139,7 @@ public class LoadingScreen extends AppCompatActivity {
             }
         });
         DatabaseReference xyval = database.getReference("x_and_y");
+        final float[] finalTemp = temp;
         xyval.addValueEventListener(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
@@ -149,6 +151,15 @@ public class LoadingScreen extends AppCompatActivity {
                     {
                         if (isSpeaking[count].equals("false")) {
                             text[count].setTextSize(TypedValue.COMPLEX_UNIT_DIP,10);
+                            String[] split = classification[count].split(" ");
+                            String[] temp=split;
+                            System.out.println(temp.toString());
+                            if (split.length>12)
+                            {
+
+                                temp = subArray(split,12,split.length);
+                            }
+                            classification[count]= temp.toString().replace("[","").replace("]","").replace(",","");
                             text[count].setText(classification[count]);
                         }
                         String[] val = snapshot.child("cords").getValue().toString().split(" ");
@@ -226,5 +237,8 @@ public class LoadingScreen extends AppCompatActivity {
         view.setY(y);
         view.getLayoutParams().height = radius;
         view.getLayoutParams().width = radius;
+    }
+    public static<T> T[] subArray(T[] array, int beg, int end) {
+        return Arrays.copyOfRange(array, beg, end + 1);
     }
 }
