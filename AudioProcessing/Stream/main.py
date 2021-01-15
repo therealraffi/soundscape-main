@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 ip = socket.gethostbyname(socket.gethostname())
 
 #Firebase
-cred = credentials.Certificate('/Users/eugene/Documents/GitHub/ISEF2021/AudioProcessing/Stream/soundy-8d98a-firebase-adminsdk-o03jf-c7fede8ea2.json')
+cred = credentials.Certificate('soundy-8d98a-firebase-adminsdk-o03jf-c7fede8ea2.json')
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://soundy-8d98a-default-rtdb.firebaseio.com/'
 })
@@ -261,27 +261,40 @@ def arduino():
     global analysis
     global running
 
-    ardlow = serial.Serial(port='/dev/tty.usbserial-14111340', baudrate=115200)
-    ardhigh = serial.Serial(port='/dev/tty.usbserial-14111330', baudrate=115200)
+    # ardlow = serial.Serial(port='/dev/tty.usbserial-14111340', baudrate=115200)
+    # ardhigh = serial.Serial(port='/dev/tty.usbserial-14111330', baudrate=115200)
+
+    ip = "35.186.188.127"
+    sendarduino = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    while True:
+        try:
+            target_ip = ip
+            target_port = 10060
+            sendarduino.connect((target_ip, target_port))
+            break
+        except:
+            print("Couldn't connect to server 10060")
 
     while running:
         try:
-            channels = np.frombuffer(postdata, dtype='int16')
+            channels = np.frombuffer(sepdata, dtype='int16')
             c0 = channels[0::8].tobytes() #red
             c1 = channels[1::8].tobytes() #green
             c2 = channels[2::8].tobytes() #blue
             c3 = channels[3::8].tobytes() #purple
 
-            # analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
+            analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
             ignore = 90
-
-            for c in range(len(angles) - 1, -1, -1):
-                i = angles[c]
-                if (180 - ignore)/2 < i[0] < (180 + ignore)/2:
-                    del angles[c]
-
             motors = [0] * 6
             inc = (360 - ignore) / 5
+
+            # if len(angles) != 0:
+                # print(angles)
+            for c in range(len(angles) - 1, -1, -1):
+                i = angles[c]
+                if (180 - ignore)/2 + inc < i[0] < (180 + ignore)/2 - inc:
+                    del angles[c]
 
             possible = [(180 + ignore)/2 + i * inc for i in range(5)]
             possible.insert(0, (180 - ignore)/2)
@@ -311,7 +324,6 @@ def arduino():
                 #amplitude should be between 0 and 100 since arduino mulplies pwm by 2.55
                 motors[ind] = [max(analysis[channel][0] * 90/100, 0), analysis[channel][1]] if analysis[channel][0] > 0 else 0
 
-            # print(angles)
             # print(analysis)
             # print(motors)
             # print("\n\n")
@@ -322,23 +334,27 @@ def arduino():
 
             low = [0] * 6
             high = [0] * 6
+            arrarduino = [0] * 6
 
             for c, i in enumerate(motors):
                 if i == 0:
+                    arrarduino[c] = [0, 0]
                     continue
                 elif i[1] > 640:
                     high[c] = i[0]
                 else:
                     low[c] = i[0]
-
+                arrarduino[c] = [low[c], high[c]]
             # print(high)
             # print(low)
-
-            out = "<%s, %s, %s, %s, %s, %s>" % (low[1], low[2], low[3], low[4], low[5], low[0])
-            ardlow.write(out.encode())
             
-            out = "<%s, %s, %s, %s, %s, %s>" % (high[1], high[2], high[3], high[4], high[5], high[0])
-            ardhigh.write(out.encode())
+            sendarduino.send(str(arrarduino).encode())
+
+            # out = "<%s, %s, %s, %s, %s, %s>" % (low[1], low[2], low[3], low[4], low[5], low[0])
+            # ardlow.write(out.encode())
+            
+            # out = "<%s, %s, %s, %s, %s, %s>" % (high[1], high[2], high[3], high[4], high[5], high[0])
+            # ardhigh.write(out.encode())
             
         except Exception as e:
             print(e)
@@ -346,15 +362,19 @@ def arduino():
 
     low = [0] * 6
     high = [0] * 6
+    arduino = [0] * 6
 
     out = "<%s, %s, %s, %s, %s, %s>" % (low[1], low[2], low[3], low[4], low[5], low[0])
-    ardlow.write(out.encode())
+    # ardlow.write(out.encode())
     
     out = "<%s, %s, %s, %s, %s, %s>" % (high[1], high[2], high[3], high[4], high[5], high[0])
-    ardhigh.write(out.encode())
+    # ardhigh.write(out.encode())
+
+    sendarduino.send(str(arduino).encode())
     
-    ardlow.close()
-    ardhigh.close()
+    # ardlow.close()
+    # ardhigh.close()
+    sendarduino.close()
 
 #Speech
 
