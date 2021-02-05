@@ -264,16 +264,16 @@ def main(channelnum):
 if __name__ == "__main__": 
     t0 = threading.Thread(target=getsound)
     t1 = threading.Thread(target=main, kwargs={'channelnum': 0}, daemon=True)
-    t2 = threading.Thread(target=main, kwargs={'channelnum': 1}, daemon=True)
-    t3 = threading.Thread(target=main, kwargs={'channelnum': 2}, daemon=True)
-    t4 = threading.Thread(target=main, kwargs={'channelnum': 3}, daemon=True)
+    # t2 = threading.Thread(target=main, kwargs={'channelnum': 1}, daemon=True)
+    # t3 = threading.Thread(target=main, kwargs={'channelnum': 2}, daemon=True)
+    # t4 = threading.Thread(target=main, kwargs={'channelnum': 3}, daemon=True)
 
     try:
         t0.start() 
         t1.start() 
-        t2.start() 
-        t3.start() 
-        t4.start() 
+        # t2.start() 
+        # t3.start() 
+        # t4.start() 
     except:
         running = False
         print("\n\n\n\n\n\n\n\nEnd Thread")

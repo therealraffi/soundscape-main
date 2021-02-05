@@ -293,7 +293,7 @@ def arduino():
                 # print(angles)
             for c in range(len(angles) - 1, -1, -1):
                 i = angles[c]
-                if (180 - ignore)/2 + inc < i[0] < (180 + ignore)/2 - inc:
+                if (180 - ignore)/2 + inc/2 < i[0] < (180 + ignore)/2 - inc/2:
                     del angles[c]
 
             possible = [(180 + ignore)/2 + i * inc for i in range(5)]
@@ -321,8 +321,8 @@ def arduino():
                                     break
                         else:
                             break
-                #amplitude should be between 0 and 100 since arduino mulplies pwm by 2.55
-                motors[ind] = [max(analysis[channel][0] * 90/100, 0), analysis[channel][1]] if analysis[channel][0] > 0 else 0
+                #amplitude should be between 0 and 100 since arduino multiplies pwm by 2.55
+                motors[ind] = [max(analysis[channel][0] * 90/100, 0), analysis[channel][1]] if analysis[channel][0] > 15 else 0
 
             # print(analysis)
             # print(motors)
