@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1DB7D45325E0CAE300FBF2CC /* soundscape WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 1DB7D45225E0CAE300FBF2CC /* soundscape WatchKit App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1DB7D45325E0CAE300FBF2CC /* SoundScape.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 1DB7D45225E0CAE300FBF2CC /* SoundScape.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1DB7D45925E0CAE400FBF2CC /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1DB7D45725E0CAE400FBF2CC /* Interface.storyboard */; };
 		1DB7D45B25E0CAE500FBF2CC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1DB7D45A25E0CAE500FBF2CC /* Assets.xcassets */; };
 		1DB7D46225E0CAE500FBF2CC /* soundscape WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 1DB7D46125E0CAE500FBF2CC /* soundscape WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -55,7 +55,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				1DB7D45325E0CAE300FBF2CC /* soundscape WatchKit App.app in Embed Watch Content */,
+				1DB7D45325E0CAE300FBF2CC /* SoundScape.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -64,7 +64,7 @@
 
 /* Begin PBXFileReference section */
 		1DB7D44E25E0CAE300FBF2CC /* soundscape.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = soundscape.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		1DB7D45225E0CAE300FBF2CC /* soundscape WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "soundscape WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DB7D45225E0CAE300FBF2CC /* SoundScape.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SoundScape.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DB7D45825E0CAE400FBF2CC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 		1DB7D45A25E0CAE500FBF2CC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1DB7D45C25E0CAE500FBF2CC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -104,7 +104,7 @@
 			isa = PBXGroup;
 			children = (
 				1DB7D44E25E0CAE300FBF2CC /* soundscape.app */,
-				1DB7D45225E0CAE300FBF2CC /* soundscape WatchKit App.app */,
+				1DB7D45225E0CAE300FBF2CC /* SoundScape.app */,
 				1DB7D46125E0CAE500FBF2CC /* soundscape WatchKit Extension.appex */,
 			);
 			name = Products;
@@ -178,7 +178,7 @@
 			);
 			name = "soundscape WatchKit App";
 			productName = "soundscape WatchKit App";
-			productReference = 1DB7D45225E0CAE300FBF2CC /* soundscape WatchKit App.app */;
+			productReference = 1DB7D45225E0CAE300FBF2CC /* SoundScape.app */;
 			productType = "com.apple.product-type.application.watchapp2";
 		};
 		1DB7D46025E0CAE500FBF2CC /* soundscape WatchKit Extension */ = {
@@ -477,7 +477,7 @@
 				IBSC_MODULE = soundscape_WatchKit_Extension;
 				INFOPLIST_FILE = "soundscape WatchKit App/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = main.soundscape.watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = SoundScape;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -496,7 +496,7 @@
 				IBSC_MODULE = soundscape_WatchKit_Extension;
 				INFOPLIST_FILE = "soundscape WatchKit App/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = main.soundscape.watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = SoundScape;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
