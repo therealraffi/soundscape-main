@@ -15,16 +15,14 @@ struct ContentView: View {
     let timer = Timer.publish(every: 0.5, on: .current, in: .common).autoconnect()
 
     var body: some View {
-        VStack {
-            Text(sound1)
-            Text(sound2)
-            Text(sound3)
-            Text(sound4)
-            Text("")
-            .onReceive(timer) { _ in
-                self.loadData()
-            }
-        }.onAppear(perform: loadData)
+        VStack (spacing: 9) {
+            Text(sound1).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(15).font(.system(size: 20))
+            Text(sound2).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(15).font(.system(size: 20))
+            Text(sound3).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(15).font(.system(size: 20))
+            Text(sound4).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(15).font(.system(size: 20))
+        }.frame(maxWidth: .infinity).onAppear(perform: loadData).onReceive(timer) { _ in
+            self.loadData()
+        }
     }
 }
 
