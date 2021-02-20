@@ -16,10 +16,10 @@ struct ContentView: View {
 
     var body: some View {
         VStack (spacing: 9) {
-            Text(sound1).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(15).font(.system(size: 20))
-            Text(sound2).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(15).font(.system(size: 20))
-            Text(sound3).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(15).font(.system(size: 20))
-            Text(sound4).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(15).font(.system(size: 20))
+            Text(sound1).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(10).font(.system(size: 20))
+            Text(sound2).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(10).font(.system(size: 20))
+            Text(sound3).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(10).font(.system(size: 20))
+            Text(sound4).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(10).font(.system(size: 20))
         }.frame(maxWidth: .infinity).onAppear(perform: loadData).onReceive(timer) { _ in
             self.loadData()
         }
