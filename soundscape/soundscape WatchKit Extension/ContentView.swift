@@ -13,15 +13,25 @@ struct ContentView: View {
     @State private var sound4 = "";
     
     let timer = Timer.publish(every: 0.5, on: .current, in: .common).autoconnect()
-
+    
+    private let colors = [
+        Color(red: 6/255, green: 214/255, blue: 160/255),
+        Color(red: 10/255, green: 133/255, blue: 237/255)
+    ]
+    
     var body: some View {
-        VStack (spacing: 9) {
-            Text(sound1).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(10).font(.system(size: 20))
-            Text(sound2).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(10).font(.system(size: 20))
-            Text(sound3).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(10).font(.system(size: 20))
-            Text(sound4).padding(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10)).background(Color.white.opacity(0.4)).cornerRadius(10).font(.system(size: 20))
-        }.frame(maxWidth: .infinity).onAppear(perform: loadData).onReceive(timer) { _ in
-            self.loadData()
+        ZStack {
+            VStack (spacing: 9) {
+                Text(sound1).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: 20))
+                
+                Text(sound2).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: 20))
+                
+                Text(sound3).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: 20))
+                
+                Text(sound4).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: 20))
+            }.frame(maxWidth: .infinity).onAppear(perform: loadData).onReceive(timer) { _ in
+                self.loadData()
+            }
         }
     }
 }
