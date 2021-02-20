@@ -12,6 +12,11 @@ struct ContentView: View {
     @State private var sound3 = "";
     @State private var sound4 = "";
     
+    @State private var f1 = 18;
+    @State private var f2 = 18;
+    @State private var f3 = 18;
+    @State private var f4 = 18;
+    
     let timer = Timer.publish(every: 0.5, on: .current, in: .common).autoconnect()
     
     private let colors = [
@@ -23,15 +28,20 @@ struct ContentView: View {
         ZStack {
             ScrollView {
                 VStack (spacing: 9) {
-                    Text(sound1).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: 18)).lineLimit(nil)
+                    Text(sound1).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.f1))).lineLimit(nil).animation(.easeInOut(duration:0.5))
                     
-                    Text(sound2).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: 18)).lineLimit(nil)
+                    Text(sound2).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.f2))).lineLimit(nil).animation(.easeInOut(duration:0.5))
                     
-                    Text(sound3).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: 18)).lineLimit(nil)
+                    Text(sound3).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.f3))).lineLimit(nil).animation(.easeInOut(duration:0.5))
                     
-                    Text(sound4).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: 18)).lineLimit(nil)
+                    Text(sound4).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.f4))).lineLimit(nil).animation(.easeInOut(duration:0.5))
+                   
                 }.frame(maxWidth: .infinity).onAppear(perform: loadData).onReceive(timer) { _ in
                     self.loadData()
+                    self.f1 = self.fontSize(str: self.sound1)
+                    self.f2 = self.fontSize(str: self.sound2)
+                    self.f3 = self.fontSize(str: self.sound3)
+                    self.f4 = self.fontSize(str: self.sound4)
                 }
             }
         }
@@ -39,6 +49,16 @@ struct ContentView: View {
 }
 
 extension ContentView {
+    func fontSize(str : String) -> Int {
+        if str.count > 18 {
+            return 14
+        }
+        if str.count > 12 {
+            return 16
+        }
+        return 18
+    }
+    
     func loadData() {
         guard let url1 = URL(string: "https://soundy-8d98a-default-rtdb.firebaseio.com/Sound/sound1.json") else {
             return
