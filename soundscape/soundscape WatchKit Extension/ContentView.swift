@@ -1,21 +1,28 @@
 import SwiftUI
 
-struct Country: Decodable {
-    var country: String
-    var code:String
+struct Sound: Codable {
+    let classification: String
+    let content: String
+    let speaking: String
 }
 
-
-
 struct ContentView: View {
-    @State private var countryData = [Country]()
+    @State private var sound1 = "";
+    @State private var sound2 = "";
+    @State private var sound3 = "";
+    @State private var sound4 = "";
     
+    let timer = Timer.publish(every: 0.5, on: .current, in: .common).autoconnect()
+
     var body: some View {
-        List(countryData, id: \.code) {
-            item in
-            HStack() {
-                Text(item.country)
-                Text(item.code)
+        VStack {
+            Text(sound1)
+            Text(sound2)
+            Text(sound3)
+            Text(sound4)
+            Text("")
+            .onReceive(timer) { _ in
+                self.loadData()
             }
         }.onAppear(perform: loadData)
     }
@@ -23,40 +30,65 @@ struct ContentView: View {
 
 extension ContentView {
     func loadData() {
-        
-        guard let url = URL(string: "https://kaleidosblog.s3-eu-west-1.amazonaws.com/json/tutorial.json") else {
+        guard let url1 = URL(string: "https://soundy-8d98a-default-rtdb.firebaseio.com/Sound/sound1.json") else {
             return
         }
         
-        let request = URLRequest(url: url)
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        let request1 = URLRequest(url: url1)
+        URLSession.shared.dataTask(with: request1) { data, response, error in
             if let data = data {
-                if let response_obj = try? JSONDecoder().decode([Country].self, from: data) {
+                if let decodedData = try? JSONDecoder().decode(Sound.self, from: data) {
                     DispatchQueue.main.async {
-                        self.countryData = response_obj
+                        self.sound1 = decodedData.classification
                     }
                 }
             }
         }.resume()
         
-        let data = Data("""
-        {
-          "classification" : "babycrying",
-          "content" : "babycrying",
-          "speaking" : "false"
+        guard let url2 = URL(string: "https://soundy-8d98a-default-rtdb.firebaseio.com/Sound/sound2.json") else {
+            return
         }
-        """.utf8)
-
-        struct Certification: Codable {
-            let classification: String
-            let content: String
-            let speaking: String
+        
+        let request2 = URLRequest(url: url2)
+        URLSession.shared.dataTask(with: request2) { data, response, error in
+            if let data = data {
+                if let decodedData = try? JSONDecoder().decode(Sound.self, from: data) {
+                    DispatchQueue.main.async {
+                        self.sound2 = decodedData.classification
+                    }
+                }
+            }
+        }.resume()
+        
+        guard let url3 = URL(string: "https://soundy-8d98a-default-rtdb.firebaseio.com/Sound/sound3.json") else {
+            return
         }
-
-        do {
-            let decodedData = try JSONDecoder().decode(Certification.self, from: data)
-            print(decodedData)
-        } catch { print(error) }
+        
+        let request3 = URLRequest(url: url3)
+        URLSession.shared.dataTask(with: request3) { data, response, error in
+            if let data = data {
+                if let decodedData = try? JSONDecoder().decode(Sound.self, from: data) {
+                    DispatchQueue.main.async {
+                        self.sound3 = decodedData.classification
+                    }
+                }
+            }
+        }.resume()
+        
+        guard let url4 = URL(string: "https://soundy-8d98a-default-rtdb.firebaseio.com/Sound/sound4.json") else {
+            return
+        }
+        
+        let request4 = URLRequest(url: url4)
+        URLSession.shared.dataTask(with: request4) { data, response, error in
+            if let data = data {
+                if let decodedData = try? JSONDecoder().decode(Sound.self, from: data) {
+                    DispatchQueue.main.async {
+                        self.sound4 = decodedData.classification
+                    }
+                }
+            }
+        }.resume()
     }
 }
 
