@@ -1,0 +1,576 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1DB7D45325E0CAE300FBF2CC /* soundscape WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 1DB7D45225E0CAE300FBF2CC /* soundscape WatchKit App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1DB7D45925E0CAE400FBF2CC /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1DB7D45725E0CAE400FBF2CC /* Interface.storyboard */; };
+		1DB7D45B25E0CAE500FBF2CC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1DB7D45A25E0CAE500FBF2CC /* Assets.xcassets */; };
+		1DB7D46225E0CAE500FBF2CC /* soundscape WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 1DB7D46125E0CAE500FBF2CC /* soundscape WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1DB7D46725E0CAE500FBF2CC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB7D46625E0CAE500FBF2CC /* ContentView.swift */; };
+		1DB7D46925E0CAE500FBF2CC /* HostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB7D46825E0CAE500FBF2CC /* HostingController.swift */; };
+		1DB7D46B25E0CAE500FBF2CC /* ExtensionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB7D46A25E0CAE500FBF2CC /* ExtensionDelegate.swift */; };
+		1DB7D46D25E0CAE500FBF2CC /* NotificationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB7D46C25E0CAE500FBF2CC /* NotificationController.swift */; };
+		1DB7D46F25E0CAE500FBF2CC /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB7D46E25E0CAE500FBF2CC /* NotificationView.swift */; };
+		1DB7D47125E0CAE600FBF2CC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1DB7D47025E0CAE600FBF2CC /* Assets.xcassets */; };
+		1DB7D47425E0CAE600FBF2CC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1DB7D47325E0CAE600FBF2CC /* Preview Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1DB7D45425E0CAE300FBF2CC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1DB7D44825E0CAE300FBF2CC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1DB7D45125E0CAE300FBF2CC;
+			remoteInfo = "soundscape WatchKit App";
+		};
+		1DB7D46325E0CAE500FBF2CC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1DB7D44825E0CAE300FBF2CC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1DB7D46025E0CAE500FBF2CC;
+			remoteInfo = "soundscape WatchKit Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1DB7D47C25E0CAE600FBF2CC /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				1DB7D46225E0CAE500FBF2CC /* soundscape WatchKit Extension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1DB7D48025E0CAE600FBF2CC /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				1DB7D45325E0CAE300FBF2CC /* soundscape WatchKit App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		1DB7D44E25E0CAE300FBF2CC /* soundscape.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = soundscape.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DB7D45225E0CAE300FBF2CC /* soundscape WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "soundscape WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DB7D45825E0CAE400FBF2CC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
+		1DB7D45A25E0CAE500FBF2CC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1DB7D45C25E0CAE500FBF2CC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1DB7D46125E0CAE500FBF2CC /* soundscape WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "soundscape WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DB7D46625E0CAE500FBF2CC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		1DB7D46825E0CAE500FBF2CC /* HostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostingController.swift; sourceTree = "<group>"; };
+		1DB7D46A25E0CAE500FBF2CC /* ExtensionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionDelegate.swift; sourceTree = "<group>"; };
+		1DB7D46C25E0CAE500FBF2CC /* NotificationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationController.swift; sourceTree = "<group>"; };
+		1DB7D46E25E0CAE500FBF2CC /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
+		1DB7D47025E0CAE600FBF2CC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1DB7D47325E0CAE600FBF2CC /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		1DB7D47525E0CAE600FBF2CC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1DB7D47625E0CAE600FBF2CC /* PushNotificationPayload.apns */ = {isa = PBXFileReference; lastKnownFileType = text; path = PushNotificationPayload.apns; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1DB7D45E25E0CAE500FBF2CC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1DB7D44725E0CAE300FBF2CC = {
+			isa = PBXGroup;
+			children = (
+				1DB7D45625E0CAE300FBF2CC /* soundscape WatchKit App */,
+				1DB7D46525E0CAE500FBF2CC /* soundscape WatchKit Extension */,
+				1DB7D44F25E0CAE300FBF2CC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1DB7D44F25E0CAE300FBF2CC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1DB7D44E25E0CAE300FBF2CC /* soundscape.app */,
+				1DB7D45225E0CAE300FBF2CC /* soundscape WatchKit App.app */,
+				1DB7D46125E0CAE500FBF2CC /* soundscape WatchKit Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1DB7D45625E0CAE300FBF2CC /* soundscape WatchKit App */ = {
+			isa = PBXGroup;
+			children = (
+				1DB7D45725E0CAE400FBF2CC /* Interface.storyboard */,
+				1DB7D45A25E0CAE500FBF2CC /* Assets.xcassets */,
+				1DB7D45C25E0CAE500FBF2CC /* Info.plist */,
+			);
+			path = "soundscape WatchKit App";
+			sourceTree = "<group>";
+		};
+		1DB7D46525E0CAE500FBF2CC /* soundscape WatchKit Extension */ = {
+			isa = PBXGroup;
+			children = (
+				1DB7D46625E0CAE500FBF2CC /* ContentView.swift */,
+				1DB7D46825E0CAE500FBF2CC /* HostingController.swift */,
+				1DB7D46A25E0CAE500FBF2CC /* ExtensionDelegate.swift */,
+				1DB7D46C25E0CAE500FBF2CC /* NotificationController.swift */,
+				1DB7D46E25E0CAE500FBF2CC /* NotificationView.swift */,
+				1DB7D47025E0CAE600FBF2CC /* Assets.xcassets */,
+				1DB7D47525E0CAE600FBF2CC /* Info.plist */,
+				1DB7D47625E0CAE600FBF2CC /* PushNotificationPayload.apns */,
+				1DB7D47225E0CAE600FBF2CC /* Preview Content */,
+			);
+			path = "soundscape WatchKit Extension";
+			sourceTree = "<group>";
+		};
+		1DB7D47225E0CAE600FBF2CC /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				1DB7D47325E0CAE600FBF2CC /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1DB7D44D25E0CAE300FBF2CC /* soundscape */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DB7D48125E0CAE600FBF2CC /* Build configuration list for PBXNativeTarget "soundscape" */;
+			buildPhases = (
+				1DB7D44C25E0CAE300FBF2CC /* Resources */,
+				1DB7D48025E0CAE600FBF2CC /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1DB7D45525E0CAE300FBF2CC /* PBXTargetDependency */,
+			);
+			name = soundscape;
+			productName = soundscape;
+			productReference = 1DB7D44E25E0CAE300FBF2CC /* soundscape.app */;
+			productType = "com.apple.product-type.application.watchapp2-container";
+		};
+		1DB7D45125E0CAE300FBF2CC /* soundscape WatchKit App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DB7D47D25E0CAE600FBF2CC /* Build configuration list for PBXNativeTarget "soundscape WatchKit App" */;
+			buildPhases = (
+				1DB7D45025E0CAE300FBF2CC /* Resources */,
+				1DB7D47C25E0CAE600FBF2CC /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1DB7D46425E0CAE500FBF2CC /* PBXTargetDependency */,
+			);
+			name = "soundscape WatchKit App";
+			productName = "soundscape WatchKit App";
+			productReference = 1DB7D45225E0CAE300FBF2CC /* soundscape WatchKit App.app */;
+			productType = "com.apple.product-type.application.watchapp2";
+		};
+		1DB7D46025E0CAE500FBF2CC /* soundscape WatchKit Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DB7D47925E0CAE600FBF2CC /* Build configuration list for PBXNativeTarget "soundscape WatchKit Extension" */;
+			buildPhases = (
+				1DB7D45D25E0CAE500FBF2CC /* Sources */,
+				1DB7D45E25E0CAE500FBF2CC /* Frameworks */,
+				1DB7D45F25E0CAE500FBF2CC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "soundscape WatchKit Extension";
+			productName = "soundscape WatchKit Extension";
+			productReference = 1DB7D46125E0CAE500FBF2CC /* soundscape WatchKit Extension.appex */;
+			productType = "com.apple.product-type.watchkit2-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1DB7D44825E0CAE300FBF2CC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1130;
+				LastUpgradeCheck = 1130;
+				ORGANIZATIONNAME = "I. Nafi";
+				TargetAttributes = {
+					1DB7D44D25E0CAE300FBF2CC = {
+						CreatedOnToolsVersion = 11.3.1;
+					};
+					1DB7D45125E0CAE300FBF2CC = {
+						CreatedOnToolsVersion = 11.3.1;
+					};
+					1DB7D46025E0CAE500FBF2CC = {
+						CreatedOnToolsVersion = 11.3.1;
+					};
+				};
+			};
+			buildConfigurationList = 1DB7D44B25E0CAE300FBF2CC /* Build configuration list for PBXProject "soundscape" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1DB7D44725E0CAE300FBF2CC;
+			productRefGroup = 1DB7D44F25E0CAE300FBF2CC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1DB7D44D25E0CAE300FBF2CC /* soundscape */,
+				1DB7D45125E0CAE300FBF2CC /* soundscape WatchKit App */,
+				1DB7D46025E0CAE500FBF2CC /* soundscape WatchKit Extension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1DB7D44C25E0CAE300FBF2CC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1DB7D45025E0CAE300FBF2CC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1DB7D45B25E0CAE500FBF2CC /* Assets.xcassets in Resources */,
+				1DB7D45925E0CAE400FBF2CC /* Interface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1DB7D45F25E0CAE500FBF2CC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1DB7D47425E0CAE600FBF2CC /* Preview Assets.xcassets in Resources */,
+				1DB7D47125E0CAE600FBF2CC /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1DB7D45D25E0CAE500FBF2CC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1DB7D46925E0CAE500FBF2CC /* HostingController.swift in Sources */,
+				1DB7D46725E0CAE500FBF2CC /* ContentView.swift in Sources */,
+				1DB7D46D25E0CAE500FBF2CC /* NotificationController.swift in Sources */,
+				1DB7D46B25E0CAE500FBF2CC /* ExtensionDelegate.swift in Sources */,
+				1DB7D46F25E0CAE500FBF2CC /* NotificationView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1DB7D45525E0CAE300FBF2CC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1DB7D45125E0CAE300FBF2CC /* soundscape WatchKit App */;
+			targetProxy = 1DB7D45425E0CAE300FBF2CC /* PBXContainerItemProxy */;
+		};
+		1DB7D46425E0CAE500FBF2CC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1DB7D46025E0CAE500FBF2CC /* soundscape WatchKit Extension */;
+			targetProxy = 1DB7D46325E0CAE500FBF2CC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		1DB7D45725E0CAE400FBF2CC /* Interface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1DB7D45825E0CAE400FBF2CC /* Base */,
+			);
+			name = Interface.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1DB7D47725E0CAE600FBF2CC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		1DB7D47825E0CAE600FBF2CC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1DB7D47A25E0CAE600FBF2CC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"soundscape WatchKit Extension/Preview Content\"";
+				DEVELOPMENT_TEAM = 6DMX3TV69N;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "soundscape WatchKit Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = main.soundscape.watchkitapp.watchkitextension;
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 6.1;
+			};
+			name = Debug;
+		};
+		1DB7D47B25E0CAE600FBF2CC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"soundscape WatchKit Extension/Preview Content\"";
+				DEVELOPMENT_TEAM = 6DMX3TV69N;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "soundscape WatchKit Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = main.soundscape.watchkitapp.watchkitextension;
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 6.1;
+			};
+			name = Release;
+		};
+		1DB7D47E25E0CAE600FBF2CC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6DMX3TV69N;
+				IBSC_MODULE = soundscape_WatchKit_Extension;
+				INFOPLIST_FILE = "soundscape WatchKit App/Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = main.soundscape.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 6.1;
+			};
+			name = Debug;
+		};
+		1DB7D47F25E0CAE600FBF2CC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6DMX3TV69N;
+				IBSC_MODULE = soundscape_WatchKit_Extension;
+				INFOPLIST_FILE = "soundscape WatchKit App/Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = main.soundscape.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 6.1;
+			};
+			name = Release;
+		};
+		1DB7D48225E0CAE600FBF2CC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6DMX3TV69N;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = main.soundscape;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		1DB7D48325E0CAE600FBF2CC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6DMX3TV69N;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = main.soundscape;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DB7D44B25E0CAE300FBF2CC /* Build configuration list for PBXProject "soundscape" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DB7D47725E0CAE600FBF2CC /* Debug */,
+				1DB7D47825E0CAE600FBF2CC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DB7D47925E0CAE600FBF2CC /* Build configuration list for PBXNativeTarget "soundscape WatchKit Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DB7D47A25E0CAE600FBF2CC /* Debug */,
+				1DB7D47B25E0CAE600FBF2CC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DB7D47D25E0CAE600FBF2CC /* Build configuration list for PBXNativeTarget "soundscape WatchKit App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DB7D47E25E0CAE600FBF2CC /* Debug */,
+				1DB7D47F25E0CAE600FBF2CC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DB7D48125E0CAE600FBF2CC /* Build configuration list for PBXNativeTarget "soundscape" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DB7D48225E0CAE600FBF2CC /* Debug */,
+				1DB7D48325E0CAE600FBF2CC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1DB7D44825E0CAE300FBF2CC /* Project object */;
+}
