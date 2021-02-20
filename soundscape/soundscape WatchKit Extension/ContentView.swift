@@ -12,36 +12,37 @@ struct ContentView: View {
     @State private var sound3 = "";
     @State private var sound4 = "";
     
-    @State private var f1 = 18;
-    @State private var f2 = 18;
-    @State private var f3 = 18;
-    @State private var f4 = 18;
+    @State private var speaking1 = "";
+    @State private var speaking2 = "";
+    @State private var speaking3 = "";
+    @State private var speaking4 = "";
     
     let timer = Timer.publish(every: 0.5, on: .current, in: .common).autoconnect()
     
-    private let colors = [
+    @State private var colors_classify = [
         Color(red: 6/255, green: 214/255, blue: 160/255),
         Color(red: 10/255, green: 133/255, blue: 237/255)
+    ]
+    
+    @State private var colors_speech = [
+        Color(red: 10/255, green: 133/255, blue: 237/255),
+        Color(red: 110/255, green: 68/255, blue: 255/255)
     ]
     
     var body: some View {
         ZStack {
             ScrollView {
                 VStack (spacing: 9) {
-                    Text(sound1).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.f1))).lineLimit(nil).animation(.easeInOut(duration:0.5))
+                    Text(sound1).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: self.backColor(self.speaking1)), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.fontSize(self.sound1)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
                     
-                    Text(sound2).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.f2))).lineLimit(nil).animation(.easeInOut(duration:0.5))
+                    Text(sound2).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: self.backColor(self.speaking2)), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.fontSize(self.sound2)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
                     
-                    Text(sound3).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.f3))).lineLimit(nil).animation(.easeInOut(duration:0.5))
+                    Text(sound3).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: self.backColor(self.speaking3)), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.fontSize(self.sound3)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
                     
-                    Text(sound4).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: colors), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.f4))).lineLimit(nil).animation(.easeInOut(duration:0.5))
+                    Text(sound4).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: self.backColor(self.speaking4)), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.fontSize(self.sound4)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
                    
                 }.frame(maxWidth: .infinity).onAppear(perform: loadData).onReceive(timer) { _ in
                     self.loadData()
-                    self.f1 = self.fontSize(str: self.sound1)
-                    self.f2 = self.fontSize(str: self.sound2)
-                    self.f3 = self.fontSize(str: self.sound3)
-                    self.f4 = self.fontSize(str: self.sound4)
                 }
             }
         }
@@ -49,7 +50,14 @@ struct ContentView: View {
 }
 
 extension ContentView {
-    func fontSize(str : String) -> Int {
+    func backColor(_ str: String) -> [Color] {
+        if str == "true" {
+            return self.colors_speech
+        }
+        return self.colors_classify
+    }
+    
+    func fontSize(_ str : String) -> Int {
         if str.count > 18 {
             return 14
         }
@@ -70,6 +78,7 @@ extension ContentView {
                 if let decodedData = try? JSONDecoder().decode(Sound.self, from: data) {
                     DispatchQueue.main.async {
                         self.sound1 = decodedData.classification
+                        self.speaking1 = decodedData.speaking
                     }
                 }
             }
@@ -85,6 +94,7 @@ extension ContentView {
                 if let decodedData = try? JSONDecoder().decode(Sound.self, from: data) {
                     DispatchQueue.main.async {
                         self.sound2 = decodedData.classification
+                        self.speaking2 = decodedData.speaking
                     }
                 }
             }
@@ -100,6 +110,7 @@ extension ContentView {
                 if let decodedData = try? JSONDecoder().decode(Sound.self, from: data) {
                     DispatchQueue.main.async {
                         self.sound3 = decodedData.classification
+                        self.speaking3 = decodedData.speaking
                     }
                 }
             }
@@ -115,6 +126,7 @@ extension ContentView {
                 if let decodedData = try? JSONDecoder().decode(Sound.self, from: data) {
                     DispatchQueue.main.async {
                         self.sound4 = decodedData.classification
+                        self.speaking4 = decodedData.speaking
                     }
                 }
             }
