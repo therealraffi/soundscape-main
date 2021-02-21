@@ -25,7 +25,7 @@ struct ContentView: View {
     
     var body: some View {
         ScrollView {
-            VStack (spacing: 9) {
+            VStack (spacing: 7) {
                 self.text(String(self.sound["sound1"]?.classification ?? ""),  String(self.sound["sound1"]?.speaking ?? ""))
                 self.text(String(self.sound["sound2"]?.classification ?? ""),  String(self.sound["sound2"]?.speaking ?? ""))
                 self.text(String(self.sound["sound3"]?.classification ?? ""),  String(self.sound["sound3"]?.speaking ?? ""))
@@ -47,10 +47,10 @@ extension ContentView {
     
     func fontSize(_ str : String) -> Int {
         if str.count > 18 {
-            return 12
+            return 14
         }
         if str.count > 12 {
-            return 14
+            return 15
         }
         return 16
     }
@@ -73,7 +73,7 @@ extension ContentView {
     }
     
     func text(_ classification: String, _ speaking: String) -> some View {
-        return Text(classification).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors:backColor(speaking)), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(fontSize(classification)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
+        return Text(classification).padding(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)).background(LinearGradient(gradient: Gradient(colors:backColor(speaking)), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(fontSize(classification)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
     }
 }
 
