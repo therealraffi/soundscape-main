@@ -407,3 +407,27 @@ if __name__ == "__main__":
         time.sleep(0.1)
         print("\n\n\n\n\n\n\n\nEnd Final")
         sys.exit()
+
+    while running:
+        try:
+
+            amps = [0] * 16
+
+            for c, i in enumerate(arduino):
+#                if c != 2:
+#                    continue
+                amps[c] = i
+
+            print(amps)
+            print()
+
+            out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (amps[1], amps[2], amps[3], amps[4], amps[5], amps[6], amps[7], amps[8], amps[9], amps[10], amps[11], amps[12], amps[13], amps[14], amps[15], amps[0])
+            teensy.write(out.encode())
+            
+        except Exception as e:
+            print(e)
+            pass
+
+    amps = [0] * 16
+
+    out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (amps[1], amps[2], amps[3], amps[4], amps[5], amps[6], amps[7], amps[8], amps[9], amps[10], amps[11], amps[12], amps[13], amps[14], amps[15], amps[0])
