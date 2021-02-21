@@ -22,14 +22,16 @@ struct ContentView: View {
         Color(red: 59/255, green: 181/255, blue: 252/255),
         Color(red: 59/255, green: 181/255, blue: 252/255)
     ]
-    
+
     var body: some View {
         ScrollView {
             VStack (spacing: 7) {
-                self.text(String(self.sound["sound1"]?.classification ?? ""),  String(self.sound["sound1"]?.speaking ?? ""))
-                self.text(String(self.sound["sound2"]?.classification ?? ""),  String(self.sound["sound2"]?.speaking ?? ""))
-                self.text(String(self.sound["sound3"]?.classification ?? ""),  String(self.sound["sound3"]?.speaking ?? ""))
-                self.text(String(self.sound["sound4"]?.classification ?? ""),  String(self.sound["sound4"]?.speaking ?? ""))
+                if self.sound["sound1"] != nil {
+                    self.text(self.sound["sound1"]!)
+                    self.text(self.sound["sound2"]!)
+                    self.text(self.sound["sound3"]!)
+                    self.text(self.sound["sound4"]!)
+                }
             }.frame(maxWidth: .infinity).onAppear(perform: loadData).onReceive(timer) { _ in
                 self.loadData()
             }
@@ -71,8 +73,9 @@ extension ContentView {
         }.resume()
     }
     
-    func text(_ classification: String, _ speaking: String) -> some View {
-        return Text(classification).padding(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)).background(LinearGradient(gradient: Gradient(colors:backColor(speaking)), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(fontSize(classification)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
+    func text(_ Case: Sound) -> some View {
+        let text = Case.speaking == "true" ? Case.content : Case.classification;
+        return Text(text).padding(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)).background(LinearGradient(gradient: Gradient(colors:backColor(Case.speaking)), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(fontSize(text)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
     }
 }
 

@@ -286,10 +286,11 @@ if __name__ == "__main__":
         s.close()
         running = False
         print("\n\n\n\n\n\n\n\nEnd Final")
-        sys.exit()
 
-        # save("speech.wav", 4, 44100, fm)   
-        # save("speechchannel0.wav", 1, 44100//2, channelframes[0])  
-        # save("speechchannel1.wav", 1, 44100//2, channelframes[1]) 
-        # save("speechchannel2.wav", 1, 44100//2, channelframes[2]) 
-        # save("speechchannel3.wav", 1, 44100//2, channelframes[3])  
+        save("speech.wav", 4, 44100, fm)   
+        save("speechchannel0.wav", 1, 44100//2, channelframes[0])  
+        save("speechchannel1.wav", 1, 44100//2, channelframes[1]) 
+        save("speechchannel2.wav", 1, 44100//2, channelframes[2]) 
+        save("speechchannel3.wav", 1, 44100//2, channelframes[3])  
+        
+        sys.exit()
