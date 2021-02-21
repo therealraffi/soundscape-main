@@ -19,8 +19,8 @@ struct ContentView: View {
     
     @State private var colors_speech = [
         //Blue to purple
-        Color(red: 10/255, green: 133/255, blue: 237/255),
-        Color(red: 10/255, green: 133/255, blue: 237/255)
+        Color(red: 59/255, green: 181/255, blue: 252/255),
+        Color(red: 59/255, green: 181/255, blue: 252/255)
     ]
     
     var body: some View {
