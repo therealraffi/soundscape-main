@@ -14,13 +14,13 @@ struct ContentView: View {
     @State private var colors_classify = [
         //Green to blue
         Color(red: 6/255, green: 214/255, blue: 160/255),
-        Color(red: 10/255, green: 133/255, blue: 237/255)
+        Color(red: 6/255, green: 214/255, blue: 160/255)
     ]
     
     @State private var colors_speech = [
         //Blue to purple
-        Color(red: 40/255, green: 63/255, blue: 237/255),
-        Color(red: 110/255, green: 68/255, blue: 255/255)
+        Color(red: 10/255, green: 133/255, blue: 237/255),
+        Color(red: 10/255, green: 133/255, blue: 237/255)
     ]
     
     var body: some View {
@@ -47,12 +47,12 @@ extension ContentView {
     
     func fontSize(_ str : String) -> Int {
         if str.count > 18 {
-            return 14
+            return 12
         }
         if str.count > 12 {
-            return 16
+            return 14
         }
-        return 18
+        return 16
     }
     
     func loadData() {
