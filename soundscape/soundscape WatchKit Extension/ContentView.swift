@@ -46,11 +46,11 @@ extension ContentView {
     }
     
     func fontSize(_ str : String) -> Int {
-        if str.count > 18 {
-            return 14
-        }
         if str.count > 12 {
             return 15
+        }
+        if str.count > 18 {
+            return 14
         }
         return 16
     }
@@ -59,7 +59,6 @@ extension ContentView {
         guard let url = URL(string: "https://soundy-8d98a-default-rtdb.firebaseio.com/Sound.json") else {
             return
         }
-        
         let request = URLRequest(url: url)
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let data = data {
