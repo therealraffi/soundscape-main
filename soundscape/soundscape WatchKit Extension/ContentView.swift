@@ -9,7 +9,7 @@ struct Sound: Codable {
 struct ContentView: View {
     @State private var sound = [String: Sound]()
     
-    let timer = Timer.publish(every: 0.5, on: .current, in: .common).autoconnect()
+    let timer = Timer.publish(every: 0.25, on: .current, in: .common).autoconnect()
     
     @State private var colors_classify = [
         //Green to blue
