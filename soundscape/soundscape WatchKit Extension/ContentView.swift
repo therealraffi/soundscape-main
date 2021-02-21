@@ -8,16 +8,6 @@ struct Sound: Codable {
 
 struct ContentView: View {
     @State private var sound = [String: Sound]()
-
-    @State private var sound1 = "";
-    @State private var sound2 = "";
-    @State private var sound3 = "";
-    @State private var sound4 = "";
-    
-    @State private var speaking1 = "";
-    @State private var speaking2 = "";
-    @State private var speaking3 = "";
-    @State private var speaking4 = "";
     
     let timer = Timer.publish(every: 0.5, on: .current, in: .common).autoconnect()
     
@@ -36,11 +26,10 @@ struct ContentView: View {
     var body: some View {
         ScrollView {
             VStack (spacing: 9) {
-                self.text(sound1, speaking1)
-                self.text(sound2, speaking2)
-                self.text(sound3, speaking3)
-                self.text(sound4, speaking4)
-                
+                self.text(String(self.sound["sound1"]?.classification ?? ""),  String(self.sound["sound1"]?.speaking ?? ""))
+                self.text(String(self.sound["sound2"]?.classification ?? ""),  String(self.sound["sound2"]?.speaking ?? ""))
+                self.text(String(self.sound["sound3"]?.classification ?? ""),  String(self.sound["sound3"]?.speaking ?? ""))
+                self.text(String(self.sound["sound4"]?.classification ?? ""),  String(self.sound["sound4"]?.speaking ?? ""))
             }.frame(maxWidth: .infinity).onAppear(perform: loadData).onReceive(timer) { _ in
                 self.loadData()
             }
@@ -77,15 +66,6 @@ extension ContentView {
                 if let decodedData = try? JSONDecoder().decode([String: Sound].self, from: data) {
                     DispatchQueue.main.async {
                         self.sound = decodedData
-
-                        self.sound1 = String(decodedData["sound1"]?.classification ?? "")
-                        self.speaking1 = String(decodedData["sound1"]?.speaking ?? "")
-                        self.sound2 = String(decodedData["sound2"]?.classification ?? "")
-                        self.speaking2 = String(decodedData["sound2"]?.speaking ?? "")
-                        self.sound3 = String(decodedData["sound3"]?.classification ?? "")
-                        self.speaking3 = String(decodedData["sound3"]?.speaking ?? "")
-                        self.sound4 = String(decodedData["sound4"]?.classification ?? "")
-                        self.speaking4 = String(decodedData["sound4"]?.speaking ?? "")
                     }
                 }
             }
@@ -102,4 +82,3 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
-
