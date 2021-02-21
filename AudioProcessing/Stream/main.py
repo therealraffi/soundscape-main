@@ -261,8 +261,7 @@ def arduino():
     global analysis
     global running
 
-    # ardlow = serial.Serial(port='/dev/tty.usbserial-14111340', baudrate=115200)
-    # ardhigh = serial.Serial(port='/dev/tty.usbserial-14111330', baudrate=115200)
+    # teensy = serial.Serial(port='/dev/tty.usbserial-14111340', baudrate=115200)
 
     ip = "35.186.188.127"
     sendarduino = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -286,8 +285,8 @@ def arduino():
 
             analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
             ignore = 90
-            motors = [0] * 6
-            inc = (360 - ignore) / 5
+            motors = [0] * 8
+            inc = (360 - ignore) / 7
 
             # if len(angles) != 0:
                 # print(angles)
@@ -296,7 +295,7 @@ def arduino():
                 if (180 - ignore)/2 + inc/2 < i[0] < (180 + ignore)/2 - inc/2:
                     del angles[c]
 
-            possible = [(180 + ignore)/2 + i * inc for i in range(5)]
+            possible = [(180 + ignore)/2 + i * inc for i in range(7)]
             possible.insert(0, (180 - ignore)/2)
 
             for angle, channel in angles:
@@ -305,7 +304,7 @@ def arduino():
                     if k - inc/2 <= angle <= k + inc/2:
                         ind = c
                         if motors[ind] != 0:
-                            if ind == 5:
+                            if ind == 7:
                                 if motors[0] == 0:
                                     ind = 0
                                     break
@@ -332,48 +331,35 @@ def arduino():
 
             print("%3s %6s \t %3s %6s \t %3s %6s \t %3s %6s" % (analysis[0][0], analysis[0][1], analysis[1][0], analysis[1][1], analysis[2][0], analysis[2][1], analysis[3][0], analysis[3][1]), amp * "|")
 
-            low = [0] * 6
-            high = [0] * 6
-            arrarduino = [0] * 6
+            amps = [0] * 16
 
             for c, i in enumerate(motors):
                 if i == 0:
-                    arrarduino[c] = [0, 0]
+                    amps[2 * c] = 0
                     continue
+                #high freqs
                 elif i[1] > 640:
-                    high[c] = i[0]
+                    amps[2 * c] = i[0]
+                #low freqs
                 else:
-                    low[c] = i[0]
-                arrarduino[c] = [low[c], high[c]]
-            # print(high)
-            # print(low)
+                    amps[2 * c + 1] = i[0]
             
-            sendarduino.send(str(arrarduino).encode())
+            sendarduino.send(str(amps).encode())
 
-            # out = "<%s, %s, %s, %s, %s, %s>" % (low[1], low[2], low[3], low[4], low[5], low[0])
-            # ardlow.write(out.encode())
-            
-            # out = "<%s, %s, %s, %s, %s, %s>" % (high[1], high[2], high[3], high[4], high[5], high[0])
-            # ardhigh.write(out.encode())
-            
+            out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (amps[1], amps[2], amps[3], amps[4], amps[5], amps[6], amps[7], amps[8], amps[9], amps[10], amps[11], amps[12], amps[13], amps[14], amps[15], amps[0])
+            # teensy.write(out.encode())
         except Exception as e:
             print(e)
             pass
 
-    low = [0] * 6
-    high = [0] * 6
-    arduino = [0] * 6
+    amps = [0] * 16
 
-    out = "<%s, %s, %s, %s, %s, %s>" % (low[1], low[2], low[3], low[4], low[5], low[0])
-    # ardlow.write(out.encode())
-    
-    out = "<%s, %s, %s, %s, %s, %s>" % (high[1], high[2], high[3], high[4], high[5], high[0])
-    # ardhigh.write(out.encode())
+    out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (amps[1], amps[2], amps[3], amps[4], amps[5], amps[6], amps[7], amps[8], amps[9], amps[10], amps[11], amps[12], amps[13], amps[14], amps[15], amps[0])
+    # teensy.write(out.encode())
 
-    sendarduino.send(str(arduino).encode())
+    sendarduino.send(str(amps).encode())
     
-    # ardlow.close()
-    # ardhigh.close()
+    # teensy.close()
     sendarduino.close()
 
 #Speech
@@ -407,27 +393,3 @@ if __name__ == "__main__":
         time.sleep(0.1)
         print("\n\n\n\n\n\n\n\nEnd Final")
         sys.exit()
-
-    while running:
-        try:
-
-            amps = [0] * 16
-
-            for c, i in enumerate(arduino):
-#                if c != 2:
-#                    continue
-                amps[c] = i
-
-            print(amps)
-            print()
-
-            out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (amps[1], amps[2], amps[3], amps[4], amps[5], amps[6], amps[7], amps[8], amps[9], amps[10], amps[11], amps[12], amps[13], amps[14], amps[15], amps[0])
-            teensy.write(out.encode())
-            
-        except Exception as e:
-            print(e)
-            pass
-
-    amps = [0] * 16
-
-    out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (amps[1], amps[2], amps[3], amps[4], amps[5], amps[6], amps[7], amps[8], amps[9], amps[10], amps[11], amps[12], amps[13], amps[14], amps[15], amps[0])
