@@ -36,39 +36,13 @@ struct ContentView: View {
     var body: some View {
         ScrollView {
             VStack (spacing: 9) {
-                //List {
-                //    ForEach(self.sound) { index in
-                //        print(index)
-                //    }
-                    /*for (key,value) in self.sound {
-                        var soundloc = String(self.sound[key]?.classification ?? "")
-                        var speakingloc = String(self.sound[key]?.speaking ?? "")
-                        Text(soundloc).padding(EdgeInsets(top: 5, leading: 12, bottom: 5, trailing: 12)).background(LinearGradient(gradient: Gradient(colors: self.backColor(speakingloc)), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.fontSize(soundloc)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
-                    }*/
-               // }
-                Text(sound1).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: self.backColor(self.speaking1)), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.fontSize(self.sound1)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
-                
-                Text(sound2).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: self.backColor(self.speaking2)), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.fontSize(self.sound2)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
-                
-                Text(sound3).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: self.backColor(self.speaking3)), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.fontSize(self.sound3)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
-                
-                Text(sound4).padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15)).background(LinearGradient(gradient: Gradient(colors: self.backColor(self.speaking4)), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(self.fontSize(self.sound4)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
                 self.text(sound1, speaking1)
-                self.text(sound1, speaking2)
-                self.text(sound1, speaking3)
-                self.text(sound1, speaking4)
+                self.text(sound2, speaking2)
+                self.text(sound3, speaking3)
+                self.text(sound4, speaking4)
                 
             }.frame(maxWidth: .infinity).onAppear(perform: loadData).onReceive(timer) { _ in
                 self.loadData()
-                //print(self.sound)
-                
-                //for (key,value) in self.sound {
-               //     print(key, value, value.classification)
-                //}
-                //print(self.s1, self.s1[0])
-                //ForEach(self.sound.keys.sorted()) { result in
-                //    print(result)
-                //}
             }
         }
     }
