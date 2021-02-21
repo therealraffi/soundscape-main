@@ -40,13 +40,6 @@ struct ContentView: View {
 }
 
 extension ContentView {
-    func backColor(_ str: String) -> [Color] {
-        if str == "true" {
-            return self.colors_speech
-        }
-        return self.colors_classify
-    }
-    
     func fontSize(_ str : String) -> Int {
         if str.count > 12 {
             return 15
@@ -74,8 +67,9 @@ extension ContentView {
     }
     
     func text(_ Case: Sound) -> some View {
-        let text = Case.speaking == "true" ? Case.content : Case.classification;
-        return Text(text).padding(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)).background(LinearGradient(gradient: Gradient(colors:backColor(Case.speaking)), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(fontSize(text)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
+        let text = Case.speaking == "true" ? Case.content : Case.classification
+        let color = Case.speaking == "true" ? self.colors_speech : self.colors_classify
+        return Text(text).padding(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)).background(LinearGradient(gradient: Gradient(colors: color), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(fontSize(text)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
     }
 }
 
