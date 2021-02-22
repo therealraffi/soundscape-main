@@ -45,7 +45,7 @@ extension ContentView {
             return 15
         }
         if str.count > 18 {
-            return 14
+            return 13
         }
         return 16
     }

@@ -31,6 +31,7 @@ postdata = b""
 running = True
 angles = []
 analysis = []
+amps = [0] * 16
 fm = []
 channelframes = [[], [], [], []]
 finalspeech = ""
@@ -169,7 +170,7 @@ def graph():
                 z = float(zc[i])
                 if x != 0 and y != 0 and z != 0:
                     theta = math.atan(y/x)
-                    x = abs(math.cos(theta)) * x / abs(x) * -1
+                    x = abs(math.cos(theta)) * x / abs(x)
                     y = abs(math.sin(theta)) * y / abs(y)
                     points.append([x, y])
                     ind.append(colors[i])
@@ -187,6 +188,7 @@ def graph():
 
                 plot.append([math.cos(angle), math.sin(angle)])
             angles = temp
+            # print(angles)
 
             #Firebase
             fire = eval(firejson(plot, ind))
@@ -254,14 +256,13 @@ def avgfreq(block):
 
         return None if math.isnan(float(out)) or len(freqdict) == 0 else max(1, int(out/2))
 
-def arduino():
+def getamps():
     global sepdata
     global postdata
     global angles
     global analysis
     global running
-
-    # teensy = serial.Serial(port='/dev/tty.usbserial-14111340', baudrate=115200)
+    global amps
 
     ip = "35.186.188.127"
     sendarduino = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -284,9 +285,13 @@ def arduino():
             c3 = channels[3::8].tobytes() #purple
 
             analysis = [[amplitude(c0), avgfreq(c0)], [amplitude(c1), avgfreq(c1)], [amplitude(c2), avgfreq(c2)], [amplitude(c3), avgfreq(c3)]]
+            #the blind sport degrees
             ignore = 90
-            motors = [0] * 8
-            inc = (360 - ignore) / 7
+            #number of motor pairs/group
+            nummotors = 8
+            #represents each motor group
+            motors = [0] * nummotors
+            inc = (360 - ignore) / (nummotors - 1)
 
             # if len(angles) != 0:
                 # print(angles)
@@ -295,21 +300,21 @@ def arduino():
                 if (180 - ignore)/2 + inc/2 < i[0] < (180 + ignore)/2 - inc/2:
                     del angles[c]
 
-            possible = [(180 + ignore)/2 + i * inc for i in range(7)]
+            possible = [((180 + ignore)/2 + i * inc) % 360 for i in range(nummotors - 1)]
             possible.insert(0, (180 - ignore)/2)
-
+            # print(analysis)
             for angle, channel in angles:
                 ind = 0
                 for c, k in enumerate(possible):
                     if k - inc/2 <= angle <= k + inc/2:
                         ind = c
                         if motors[ind] != 0:
-                            if ind == 7:
+                            if ind == nummotors - 1:
                                 if motors[0] == 0:
                                     ind = 0
                                     break
-                                if motors[4] == 0:
-                                    ind = 4
+                                if motors[nummotors - 2] == 0:
+                                    ind = nummotors - 2
                                     break
                             else:
                                 if motors[ind + 1] == 0:
@@ -320,10 +325,10 @@ def arduino():
                                     break
                         else:
                             break
-                #amplitude should be between 0 and 100 since arduino multiplies pwm by 2.55
-                motors[ind] = [max(analysis[channel][0] * 90/100, 0), analysis[channel][1]] if analysis[channel][0] > 15 else 0
+                #amplitude should be between 0 and 100 since arduino multiplies pwm by 2.55 - this also sets the minimum amplitude for a source to be represented
+                motors[ind] = [max(analysis[channel][0] * 90/100, 0), analysis[channel][1]] if analysis[channel][0] > 2 else 0
 
-            # print(analysis)
+            # print(angles)
             # print(motors)
             # print("\n\n")
             # amp = max(analysis[0][0], analysis[1][0], analysis[2][0], analysis[3][0])
@@ -331,23 +336,38 @@ def arduino():
 
             print("%3s %6s \t %3s %6s \t %3s %6s \t %3s %6s" % (analysis[0][0], analysis[0][1], analysis[1][0], analysis[1][1], analysis[2][0], analysis[2][1], analysis[3][0], analysis[3][1]), amp * "|")
 
-            amps = [0] * 16
+            temp = [0] * 16
 
             for c, i in enumerate(motors):
                 if i == 0:
-                    amps[2 * c] = 0
+                    temp[2 * c] = 0
                     continue
-                #high freqs
-                elif i[1] > 640:
-                    amps[2 * c] = i[0]
                 #low freqs
+                elif i[1] < 640:
+                    temp[2 * c] = i[0]
+                #high freqs
                 else:
-                    amps[2 * c + 1] = i[0]
-            
-            sendarduino.send(str(amps).encode())
+                    temp[2 * c + 1] = i[0]
 
+            amps = temp
+            sendarduino.send(str(amps).encode())
+            # print(amps)
+            # print("\n\n")
+        except Exception as e:
+            print(e)
+            pass
+
+    sendarduino.send(str(amps).encode())
+    sendarduino.close()
+
+def sendboard():
+    global amps
+    teensy = serial.Serial(port='/dev/tty.usbmodem88145901', baudrate=9600)
+
+    while running:
+        try:
             out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (amps[1], amps[2], amps[3], amps[4], amps[5], amps[6], amps[7], amps[8], amps[9], amps[10], amps[11], amps[12], amps[13], amps[14], amps[15], amps[0])
-            # teensy.write(out.encode())
+            teensy.write(out.encode())
         except Exception as e:
             print(e)
             pass
@@ -355,22 +375,18 @@ def arduino():
     amps = [0] * 16
 
     out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (amps[1], amps[2], amps[3], amps[4], amps[5], amps[6], amps[7], amps[8], amps[9], amps[10], amps[11], amps[12], amps[13], amps[14], amps[15], amps[0])
-    # teensy.write(out.encode())
+    teensy.write(out.encode())
 
-    sendarduino.send(str(amps).encode())
-    
-    # teensy.close()
-    sendarduino.close()
-
-#Speech
+    teensy.close()
 
 if __name__ == "__main__": 
     t1 = threading.Thread(target=sep, daemon=True)
     t2 = threading.Thread(target=post, daemon=True) 
     t3 = threading.Thread(target=position, daemon=True) 
     t4 = threading.Thread(target=graph, daemon=True) 
-    t5 = threading.Thread(target=arduino, daemon=True) 
-    t6 = threading.Thread(target=getanalysis, daemon=True) 
+    t5 = threading.Thread(target=getamps, daemon=True) 
+    # t6 = threading.Thread(target=getanalysis, daemon=True) 
+    t7 = threading.Thread(target=sendboard, daemon=True) 
 
     try:
         t1.start() 
@@ -378,7 +394,8 @@ if __name__ == "__main__":
         t3.start() 
         t4.start() 
         t5.start() 
-        t6.start() 
+        # t6.start() 
+        t7.start() 
     except:
         running = False
         time.sleep(0.1)

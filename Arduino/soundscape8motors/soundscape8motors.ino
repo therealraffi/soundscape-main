@@ -1,14 +1,14 @@
-const byte numChars = 128;
+const byte numChars = 64;
 char receivedChars[numChars];
 char tempChars[numChars];
 
-int amps[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int amps[16];
 int pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18, 19};
 
 boolean newData = false;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   for (int i = 0; i < 16; i++) {
     pinMode(pins[i], OUTPUT);
   }
@@ -18,11 +18,11 @@ void loop() {
   //Serial.println("Hello World...");
   //delay(1000);
   
-  for (int i = 0; i < 16; i++) {
+  /*for (int i = 0; i < 16; i++) {
     Serial.print(amps[i]);
     Serial.print(" ");
   }
-  Serial.println();
+  Serial.println();*/
   
   recvWithStartEndMarkers();
   if (newData == true) {
@@ -34,6 +34,7 @@ void loop() {
     }
     newData = false;
   }
+  //delay(10);
 }
 
  void recvWithStartEndMarkers() {
