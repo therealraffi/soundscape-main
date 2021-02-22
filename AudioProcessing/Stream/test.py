@@ -4,7 +4,7 @@ angles = [[70.47311638118093, 0], [188.7402959508126, 1], [27.883596528122773, 2
 #the blind sport degrees
 ignore = 90
 #number of motor pairs/group
-nummotors = 8
+nummotors = 9
 #represents each motor group
 motors = [0] * nummotors
 inc = (360 - ignore) / (nummotors - 1)
@@ -17,9 +17,9 @@ for c in range(len(angles) - 1, -1, -1):
     if (180 - ignore)/2 + inc/2 < i[0] < (180 + ignore)/2 - inc/2:
         del angles[c]
 print(angles)
-print()
+print(inc)
 
-possible = [(int((180 + ignore)/2 + i * inc)) % 360 for i in range(nummotors - 1)]
+possible = [((180 + ignore)/2 + i * inc) % 360 for i in range(nummotors - 1)]
 possible.insert(0, (180 - ignore)/2)
 possible.sort()
 print(possible)

@@ -1,15 +1,16 @@
-const byte numChars = 64;
+const byte numChars = 128;
 char receivedChars[numChars];
 char tempChars[numChars];
 
-int amps[16];
-int pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18, 19};
+const int devices = 18;
+int amps[devices];
+int pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18, 19, 22, 23};
 
 boolean newData = false;
 
 void setup() {
   Serial.begin(9600);
-  for (int i = 0; i < 16; i++) {
+  for (int i = 0; i < devices; i++) {
     pinMode(pins[i], OUTPUT);
   }
 }
@@ -29,7 +30,7 @@ void loop() {
     strcpy(tempChars, receivedChars);
     parseData();
     showParsedData();
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < devices; i++) {
       analogWrite(pins[i], amps[i] * 2.55);
     }
     newData = false;
@@ -73,14 +74,14 @@ void loop() {
   strtokIndx = strtok(tempChars, ",");
   amps[0] = atoi(strtokIndx);
   
-  for (int i = 1; i < 16; i++) {
+  for (int i = 1; i < devices; i++) {
     strtokIndx = strtok(NULL, ",");
     amps[i] = atoi(strtokIndx);
   }
  }
 
  void showParsedData() {
-  for (int i = 0; i < 16; i++) {
+  for (int i = 0; i < devices; i++) {
     Serial.print(amps[i]);
     Serial.print(" ");
   }

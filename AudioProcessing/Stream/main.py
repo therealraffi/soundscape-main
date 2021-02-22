@@ -288,13 +288,15 @@ def getamps():
             #the blind sport degrees
             ignore = 90
             #number of motor pairs/group
-            nummotors = 8
+            nummotors = 9
             #represents each motor group
             motors = [0] * nummotors
             inc = (360 - ignore) / (nummotors - 1)
 
             # if len(angles) != 0:
                 # print(angles)
+
+            #removes angles in blindspot
             for c in range(len(angles) - 1, -1, -1):
                 i = angles[c]
                 if (180 - ignore)/2 + inc/2 < i[0] < (180 + ignore)/2 - inc/2:
@@ -338,7 +340,7 @@ def getamps():
 
             print("%3s %6s \t %3s %6s \t %3s %6s \t %3s %6s" % (analysis[0][0], analysis[0][1], analysis[1][0], analysis[1][1], analysis[2][0], analysis[2][1], analysis[3][0], analysis[3][1]), amp * "|")
 
-            temp = [0] * 16
+            temp = [0] * 2 * nummotors
 
             for c, i in enumerate(motors):
                 if i == 0:
@@ -368,15 +370,15 @@ def sendboard():
 
     while running:
         try:
-            out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (amps[2], amps[3], amps[0], amps[1], amps[14], amps[15], amps[12], amps[13], amps[10], amps[11], amps[8], amps[9], amps[6], amps[7], amps[4], amps[5])
+            out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (amps[2], amps[3], amps[0], amps[1], amps[16], amps[17], amps[14], amps[15], amps[10], amps[11], amps[8], amps[9], amps[6], amps[7], amps[4], amps[5], amps[12], amps[13])
             teensy.write(out.encode())
         except Exception as e:
             print(e)
             pass
 
-    amps = [0] * 16
+    amps = [0] * 18
 
-    out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     teensy.write(out.encode())
 
     teensy.close()
