@@ -265,16 +265,16 @@ def getamps():
     global amps
 
     ip = "35.186.188.127"
-    sendarduino = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # sendarduino = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    while True:
-        try:
-            target_ip = ip
-            target_port = 10060
-            sendarduino.connect((target_ip, target_port))
-            break
-        except:
-            print("Couldn't connect to server 10060")
+    # while True:
+        # try:
+        #     target_ip = ip
+        #     target_port = 10060
+        #     sendarduino.connect((target_ip, target_port))
+        #     break
+        # except:
+        #     print("Couldn't connect to server 10060")
 
     while running:
         try:
@@ -302,6 +302,8 @@ def getamps():
 
             possible = [((180 + ignore)/2 + i * inc) % 360 for i in range(nummotors - 1)]
             possible.insert(0, (180 - ignore)/2)
+            possible.sort()
+            # print(possible)
             # print(analysis)
             for angle, channel in angles:
                 ind = 0
@@ -350,15 +352,15 @@ def getamps():
                     temp[2 * c + 1] = i[0]
 
             amps = temp
-            sendarduino.send(str(amps).encode())
+            # sendarduino.send(str(amps).encode())
             # print(amps)
             # print("\n\n")
         except Exception as e:
             print(e)
             pass
 
-    sendarduino.send(str(amps).encode())
-    sendarduino.close()
+    # sendarduino.send(str(amps).encode())
+    # sendarduino.close()
 
 def sendboard():
     global amps
@@ -366,7 +368,7 @@ def sendboard():
 
     while running:
         try:
-            out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (amps[1], amps[2], amps[3], amps[4], amps[5], amps[6], amps[7], amps[8], amps[9], amps[10], amps[11], amps[12], amps[13], amps[14], amps[15], amps[0])
+            out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (amps[2], amps[3], amps[0], amps[1], amps[14], amps[15], amps[12], amps[13], amps[10], amps[11], amps[8], amps[9], amps[6], amps[7], amps[4], amps[5])
             teensy.write(out.encode())
         except Exception as e:
             print(e)
@@ -374,7 +376,7 @@ def sendboard():
 
     amps = [0] * 16
 
-    out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (amps[1], amps[2], amps[3], amps[4], amps[5], amps[6], amps[7], amps[8], amps[9], amps[10], amps[11], amps[12], amps[13], amps[14], amps[15], amps[0])
+    out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     teensy.write(out.encode())
 
     teensy.close()
