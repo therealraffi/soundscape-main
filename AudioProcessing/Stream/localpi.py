@@ -3,9 +3,6 @@ import threading
 import pyaudio
 import numpy as np
 import re
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import db
 import json
 import math
 import struct
@@ -16,13 +13,8 @@ import sys
 import matplotlib.pyplot as plt
 
 #Local IP
-ip = socket.gethostbyname(socket.gethostname())
-
-#Firebase
-cred = credentials.Certificate('soundy-8d98a-firebase-adminsdk-o03jf-c7fede8ea2.json')
-firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://soundy-8d98a-default-rtdb.firebaseio.com/'
-})
+# ip = socket.gethostbyname(socket.gethostname())
+ip = "127.0.1.1"
 
 #Global Data Vars
 graphdata = b""
@@ -31,128 +23,100 @@ postdata = b""
 running = True
 angles = []
 analysis = []
-amps = [0] * 16
+amps = [0] * 18
 fm = []
 channelframes = [[], [], [], []]
 finalspeech = ""
-ref = db.reference('Sound')
 
 # Audio recording parameters
 STREAMING_LIMIT = 240000  # 4 minutes
 SAMPLE_RATE = 44100//2
 CHUNK_SIZE = 8192  # 100ms
 
-def sep():
-    global sepdata
-    global running
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    while True:
-        try:
-            target_ip = "35.186.188.127"
-            target_port = 10000
-            s.connect((target_ip, target_port))
-            break
-        except:
-            print("Couldn't connect to server 9000")
-
-    while running:
-        try:
-            sepdata = s.recv(8192)
-        except Exception as e:
-            s.close()
-            pass
-    s.close()
-
-def post():
-    global postdata
-    global running
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    while True:
-        try:
-            target_ip = "35.186.188.127"
-            target_port = 10010
-            s.connect((target_ip, target_port))
-            break
-        except:
-            print("Couldn't connect to server 9000")
-
-    while running:
-        try:
-            postdata = s.recv(8192)
-        except Exception as e:
-            s.close()
-            pass
-    s.close()
-
 def position():
+    global ip
     global graphdata
     global running
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
     while True:
         try:
-            target_ip = "35.186.188.127"
-            target_port = 9000
-            s.connect((target_ip, target_port))
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.bind((ip, 9000))
             break
-        except:
-            print("Couldn't connect to server 9000")
+        except Exception as e:
+            print("Couldn't bind to that port %s" % (9000))
+
+    s.listen(100)
 
     while running:
-        try:
-            graphdata = s.recv(8192)
-        except Exception as e:
-            s.close()
-            pass
-    s.close()
+        c, addr = s.accept()
+        while running:
+            try:
+                graphdata = c.recv(8192)
+                print(graphdata)
+            except Exception as e:
+                print("9000", e)
+                c.close()
+                pass
+        c.close()
 
-def getanalysis():
-    global analysis
+def sep():
+    global ip
+    global sepdata
     global running
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
     while True:
         try:
-            target_ip = "35.186.188.127"
-            target_port = 10050
-            s.connect((target_ip, target_port))
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.bind((ip, 10000))
             break
-        except:
-            print("Couldn't connect to server 10050")
+        except Exception as e:
+            print("Couldn't bind to that port %s" % (9000))
+
+    s.listen(100)
 
     while running:
+        c, addr = s.accept()
+        while running:
+            try:
+                sepdata = c.recv(8192)
+            except Exception as e:
+                print("10000", e)
+                c.close()
+                pass
+        c.close()
+
+def post():
+    global ip
+    global postdata
+    global running
+
+    while True:
         try:
-            data = s.recv(512)
-            if data != b'':
-                analysis = eval("[[" + re.findall(r'\[\[(.*?)\]\]', data.decode())[0] + "]]")
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.bind((ip, 10010))
+            break
         except Exception as e:
-            s.close()
-            # print(e)
-            pass
-    s.close()
+            print("Couldn't bind to that port %s" % (9000))
 
-def firejson(plot, colors):
-    visible = ['false'] * 4
-    for i in colors:
-        visible[int(i[1])] = 'true'
+    s.listen(100)
 
-    out = ""
-    plotind = 0
-
-    for i in range(4):
-        if visible[i] == 'false':
-            out += "'sound%s': {'cords': '%f %f', 'visibility' : 'false'}, " % (i + 1, 0, 0)
-        else:
-            col = colors[plotind]
-            out += "'sound%s': {'cords': '%f %f', 'visibility' : 'true'}, " % (i + 1, plot[plotind][0], plot[plotind][1])
-            plotind += 1
-    
-    return "{" + out[:-2] + "}"
+    while running:
+        c, addr = s.accept()
+        while running:
+            try:
+                postdata = c.recv(8192)
+            except Exception as e:
+                print("10010", e)
+                c.close()
+                pass
+        c.close()
 
 def graph():
     global graphdata
     global angles
     global running
 
-    firecoord = db.reference('x_and_y')   
     while running:
         try:
             coord = graphdata.decode().replace("\n", "")
@@ -189,11 +153,6 @@ def graph():
 
                 plot.append([math.cos(angle), math.sin(angle)])
             angles = temp
-            # print(angles)
-
-            #Firebase
-            fire = eval(firejson(plot, ind))
-            firecoord.set(fire)
         except KeyboardInterrupt as e:
             pass
         except Exception as e:
@@ -246,11 +205,6 @@ def avgfreq(block):
         wsum = sum(freqdict.values())
         wsum = wsum if wsum != 0 else 1
 
-        # print()
-        # for i in freqdict:
-        #     print(int(i), "\t", freqdict[i] * 100 / wsum)
-        # print()
-
         out = 0
         for i in freqdict:
             out += i * freqdict[i] / wsum
@@ -264,18 +218,6 @@ def getamps():
     global analysis
     global running
     global amps
-
-    ip = "35.186.188.127"
-    # sendarduino = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    # while True:
-        # try:
-        #     target_ip = ip
-        #     target_port = 10060
-        #     sendarduino.connect((target_ip, target_port))
-        #     break
-        # except:
-        #     print("Couldn't connect to server 10060")
 
     while running:
         try:
@@ -294,9 +236,6 @@ def getamps():
             motors = [0] * nummotors
             inc = (360 - ignore) / (nummotors - 1)
 
-            # if len(angles) != 0:
-                # print(angles)
-
             #removes angles in blindspot
             for c in range(len(angles) - 1, -1, -1):
                 i = angles[c]
@@ -306,8 +245,7 @@ def getamps():
             possible = [((180 + ignore)/2 + i * inc) % 360 for i in range(nummotors - 1)]
             possible.insert(0, (180 - ignore)/2)
             possible.sort()
-            # print(possible)
-            # print(analysis)
+
             for angle, channel in angles:
                 ind = 0
                 for c, k in enumerate(possible):
@@ -333,10 +271,6 @@ def getamps():
                 #amplitude should be between 0 and 100 since arduino multiplies pwm by 2.55 - this also sets the minimum amplitude for a source to be represented
                 motors[ind] = [max(analysis[channel][0] * 90/100, 0), analysis[channel][1]] if analysis[channel][0] > 2 else 0
 
-            # print(angles)
-            # print(motors)
-            # print("\n\n")
-            # amp = max(analysis[0][0], analysis[1][0], analysis[2][0], analysis[3][0])
             amp = amplitude(postdata)
 
             print("%3s %6s \t %3s %6s \t %3s %6s \t %3s %6s" % (analysis[0][0], analysis[0][1], analysis[1][0], analysis[1][1], analysis[2][0], analysis[2][1], analysis[3][0], analysis[3][1]), amp * "|")
@@ -355,19 +289,14 @@ def getamps():
                     temp[2 * c + 1] = i[0]
 
             amps = temp
-            # sendarduino.send(str(amps).encode())
-            # print(amps)
-            # print("\n\n")
         except Exception as e:
             print(e)
             pass
 
-    # sendarduino.send(str(amps).encode())
-    # sendarduino.close()
-
 def sendboard():
     global amps
-    teensy = serial.Serial(port='/dev/tty.usbmodem88145901', baudrate=9600)
+    global running
+    teensy = serial.Serial(port='/dev/ttyACM0', baudrate=9600)
 
     while running:
         try:
@@ -376,7 +305,7 @@ def sendboard():
         except Exception as e:
             print(e)
             pass
-
+  
     amps = [0] * 18
 
     out = "<%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s>" % (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -390,7 +319,6 @@ if __name__ == "__main__":
     t3 = threading.Thread(target=position, daemon=True) 
     t4 = threading.Thread(target=graph, daemon=True) 
     t5 = threading.Thread(target=getamps, daemon=True) 
-    # t6 = threading.Thread(target=getanalysis, daemon=True) 
     t7 = threading.Thread(target=sendboard, daemon=True) 
 
     try:
@@ -399,7 +327,6 @@ if __name__ == "__main__":
         t3.start() 
         t4.start() 
         t5.start() 
-        # t6.start() 
         t7.start() 
     except:
         running = False
@@ -415,5 +342,3 @@ if __name__ == "__main__":
         time.sleep(0.1)
         print("\n\n\n\n\n\n\n\nEnd Final")
         sys.exit()
-
-#obama 6:04

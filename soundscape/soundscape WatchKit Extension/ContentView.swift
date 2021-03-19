@@ -25,7 +25,7 @@ struct ContentView: View {
 
     var body: some View {
         ScrollView {
-            VStack (spacing: 7) {
+            VStack (spacing: 25) {
                 if self.sound["sound1"] != nil {
                     self.text(self.sound["sound1"]!)
                     self.text(self.sound["sound2"]!)
@@ -42,12 +42,12 @@ struct ContentView: View {
 extension ContentView {
     func fontSize(_ str : String) -> Int {
         if str.count > 12 {
-            return 15
+            return 12
         }
         if str.count > 18 {
-            return 13
+            return 12
         }
-        return 16
+        return 12
     }
     
     func loadData() {
@@ -69,7 +69,7 @@ extension ContentView {
     func text(_ Case: Sound) -> some View {
         let text = Case.speaking == "true" ? Case.content : Case.classification
         let color = Case.speaking == "true" ? self.colors_speech : self.colors_classify
-        return Text(text).padding(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 12)).background(LinearGradient(gradient: Gradient(colors: color), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(fontSize(text)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
+        return Text(text).padding(EdgeInsets(top: 4, leading: 12, bottom: 4, trailing: 10)).background(LinearGradient(gradient: Gradient(colors: color), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)).cornerRadius(10).font(.system(size: CGFloat(fontSize(text)))).lineLimit(nil).animation(.easeInOut(duration:0.5))
     }
 }
 

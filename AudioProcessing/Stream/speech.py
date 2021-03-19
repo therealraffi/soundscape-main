@@ -182,6 +182,7 @@ def listen_print_loop(responses, stream, channelnum):
             + (STREAMING_LIMIT * stream.restart_counter)
         )
 
+        ref.child("sound" + str(channelnum + 1)).child("speaking").set("true")
         ref.child("sound" + str(channelnum + 1)).child("content").set(transcript)
 
         if result.is_final:
@@ -263,7 +264,7 @@ def main(channelnum):
 
 if __name__ == "__main__": 
     t0 = threading.Thread(target=getsound)
-    t1 = threading.Thread(target=main, kwargs={'channelnum': 0}, daemon=True)
+    t1 = threading.Thread(target=main, kwargs={'channelnum': 1}, daemon=True)
     # t2 = threading.Thread(target=main, kwargs={'channelnum': 1}, daemon=True)
     # t3 = threading.Thread(target=main, kwargs={'channelnum': 2}, daemon=True)
     # t4 = threading.Thread(target=main, kwargs={'channelnum': 3}, daemon=True)
